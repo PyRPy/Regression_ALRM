@@ -1,0 +1,72 @@
+---
+title: "Lesson 8: Categorical Predictors"
+output: html_notebook
+---
+Birthweight and smoking (2-level categorical predictor, additive model)
+https://onlinecourses.science.psu.edu/stat501/node/426/
+
+    Load the birthsmokers data.
+    Create a scatterplot matrix of the data
+    Fit a multiple linear regression model of Wgt on Gest + Smoke.
+    Display scatterplot of Wgt vs Gest with points marked by Smoke and add parallel regression lines representing Smoke=0 and Smoke=1.
+    Display regression results and calculate confidence intervals for the regression parameters.
+    Display confidence intervals for expected Wgt at Gest=38 (for Smoke=1 and Smoke=0).
+    Repeat analysis separately for Smoke=0 and Smoke=1.
+    Repeat analysis using (1, -1) coding.
+
+```{r message=FALSE, warning=FALSE}
+birthsmokers <- read.csv("DataL8/birthsmokers.csv", header=T)
+attach(birthsmokers)
+# head(birthsmokers)
+# str(birthsmokers)
+birthsmokers$Smoke <- as.factor(birthsmokers$Smoke)
+str(birthsmokers)
+pairs(cbind(Wgt, Gest, Smoke))
+head(birthsmokers)
+```
+```{r}
+model <- lm(Wgt ~ Gest + Smoke)
+
+plot(x=Gest, y=Wgt, ylim=c(2300, 3700), 
+     col=ifelse(Smoke==1, "red", "blue"),
+     panel.last = c(lines(sort(Gest[Smoke==0]),
+                          fitted(model)[Smoke==0][order(Gest[Smoke==0])],
+                          col="blue"),
+                    lines(sort(Gest[Smoke==1]),
+                          fitted(model)[Smoke==1][order(Gest[Smoke==1])],
+                          col="red")))
+```
+```{r}
+summary(model)
+```
+```{r}
+confint(model)
+```
+```{r}
+predict(model, interval="confidence",
+        newdata=data.frame(Gest=c(38, 38), Smoke=c(1, 0)))
+```
+```{r}
+model.0 <- lm(Wgt ~ Gest, subset=Smoke==0) # changed to '0' from "no"
+summary(model.0)
+```
+```{r}
+predict(model.0, interval="confidence",
+        newdata=data.frame(Gest=38))
+```
+```{r}
+model.1 <- lm(Wgt ~ Gest, subset=Smoke==1) # changed to 1 from 'Yes'
+summary(model.1)
+```
+```{r}
+predict(model.1, interval="confidence",
+        newdata=data.frame(Gest=38))
+```
+```{r}
+Smoke2 <- ifelse(Smoke=="yes", 1, -1)
+model.3 <- lm(Wgt ~ Gest + Smoke2)
+summary(model.3)
+detach(birthsmokers)
+```
+
+

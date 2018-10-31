@@ -1,0 +1,249 @@
+---
+title: "Lesson 11: Influential Points"
+output: html_notebook
+---
+https://onlinecourses.science.psu.edu/stat501/node/429/
+```{r}
+library(knitr)
+```
+
+# Influence 1 (no influential points)
+
+    Load the influence1 data.
+    Create a scatterplot of the data.
+
+```{r message=FALSE}
+# getwd()
+influence1 <- read.csv("DataL11/influence1.csv", header=T)
+library(ggplot2)
+attach(influence1)
+# head(influence1)
+qplot(data=influence1, x=x, y=y)
+
+detach(influence1)
+```
+# Influence 2 (outlier, low leverage, not influential)
+
+    Load the influence2 data.
+    Create a scatterplot of the data.
+    Fit a simple linear regression model to all the data.
+    Fit a simple linear regression model to the data excluding observation #21.
+    Add regression lines to the scatterplot, one for each model.
+    Calculate leverages, standardized residuals, studentized residuals, DFFITS, Cook's distances. 
+```{r message=FALSE}
+influence2 <- read.csv("DataL11/influence2.csv", header=T)
+attach(influence2)
+# head(influence2)
+qplot(data= influence2, x=x, y=y)
+```
+```{r}
+model.1 <- lm(y ~ x)
+summary(model.1)
+```
+```{r}
+model.2 <- lm(y ~ x, subset=1:20) # exclude obs #21
+summary(model.2)
+```
+```{r}
+plot(x=x, y=y, col=ifelse(Row<=20, "blue", "red"),
+     panel.last = c(lines(sort(x), fitted(model.1)[order(x)], col="red"),
+                    lines(sort(x[-21]), fitted(model.2)[order(x[-21])],
+                          col="red", lty=2)),
+     data=influence2)
+legend("topleft", col="red", lty=c(1,2),
+       inset=0.02, legend=c("Red point included", "Red point excluded"))
+```
+```{r}
+lev <- hatvalues(model.1)
+round(lev, 6)
+```
+```{r}
+sum(lev) # 2
+```
+```{r}
+sta <- rstandard(model.1)
+round(sta, 6)
+```
+```{r}
+stu <- rstudent(model.1)
+round(stu, 6)
+```
+```{r}
+dffit <- dffits(model.1)
+round(dffit, 6)
+```
+```{r}
+cook <- cooks.distance(model.1)
+round(cook, 6)
+detach(influence2)
+```
+# Influence 3 (high leverage, not an outlier, not influential)
+
+    Load the influence3 data.
+    Create a scatterplot of the data.
+    Fit a simple linear regression model to all the data.
+    Fit a simple linear regression model to the data excluding observation #21.
+    Add regression lines to the scatterplot, one for each model.
+    Calculate leverages, DFFITS, Cook's distances.
+```{r}
+influence3 <- read.csv("DataL11/influence3.csv", header=T)
+attach(influence3)
+
+plot(x, y)
+
+```
+```{r}
+model.1 <- lm(y ~ x)
+summary(model.1)
+```
+```{r}
+model.2 <- lm(y ~ x, subset=1:20) # exclude obs #21
+summary(model.2)
+```
+```{r}
+plot(x=x, y=y, col=ifelse(Row<=20, "blue", "red"),
+     panel.last = c(lines(sort(x), fitted(model.1)[order(x)], col="red"),
+                    lines(sort(x[-21]), fitted(model.2)[order(x[-21])],
+                          col="red", lty=2)))
+legend("topleft", col="red", lty=c(1,2),
+       inset=0.02, legend=c("Red point included", "Red point excluded"))
+
+```
+```{r}
+lev <- hatvalues(model.1)
+round(lev, 6)
+```
+```{r}
+dffit <- dffits(model.1)
+round(dffit, 6)
+```
+```{r}
+cook <- cooks.distance(model.1)
+round(cook, 6)
+detach(influence3)
+```
+# Influence 4 (outlier, high leverage, influential)
+
+    Load the influence4 data.
+    Create a scatterplot of the data.
+    Fit a simple linear regression model to all the data.
+    Fit a simple linear regression model to the data excluding observation #21.
+    Add regression lines to the scatterplot, one for each model.
+    Calculate leverages, DFFITS, Cook's distances.
+
+```{r message=FALSE}
+influence4 <- read.csv("DataL11/influence4.csv", header=T)
+attach(influence4)
+
+qplot(x, y)
+```
+```{r}
+model.1 <- lm(y ~ x)
+summary(model.1)
+```
+```{r}
+model.2 <- lm(y ~ x, subset=1:20) # exclude obs #21
+summary(model.2)
+```
+```{r}
+plot(x=x, y=y, col=ifelse(Row<=20, "blue", "red"),
+     panel.last = c(lines(sort(x), fitted(model.1)[order(x)], col="red"),
+                    lines(sort(x[-21]), fitted(model.2)[order(x[-21])],
+                          col="red", lty=2)))
+legend("topleft", col="red", lty=c(1,2),
+       inset=0.02, legend=c("Red point included", "Red point excluded"))
+
+```
+```{r}
+qplot(data=influence4, x=x, y=y) +
+  geom_line(aes(x=x, y=model.1$fitted.values, colour="whole data")) +
+  geom_line(data=influence4[-21, ], aes(x=x, y=model.2$fitted.values, colour="no outlier")) +
+  xlim(c(0, 16))
+
+# influence4[-21, ]            
+```
+You can clearly see the slope for model.1 is `r round(model.1$coefficients["x"], 4)` while the slope for model.2 is
+`r round(model.2$coefficients["x"], 4)`
+
+```{r}
+lev <- hatvalues(model.1)
+round(lev, 6)
+```
+```{r}
+sum(lev) # 2
+```
+```{r}
+dffit <- dffits(model.1)
+round(dffit, 6)
+```
+```{r}
+cook <- cooks.distance(model.1)
+round(cook, 6)
+detach(influence4)
+```
+# Foot length and height (outlier, high leverage, influential)
+
+    Load the height_foot data.
+    Create a scatterplot of the data.
+    Fit a simple linear regression model to all the data.
+    Fit a simple linear regression model to the data excluding observation #28.
+    Calculate DFFITS and Cook's distance for obs #28.
+```{r}
+heightfoot <- read.table("DataL11/height_foot.txt", header=T)
+attach(heightfoot)
+
+qplot(height, foot)
+```
+```{r}
+model.1 <- lm(foot ~ height)
+summary(model.1)
+```
+```{r}
+which(height>80) # 28
+model.2 <- lm(foot ~ height, subset=(1:33)[-28]) # exclude obs #28
+summary(model.2)
+```
+```{r}
+dffit <- dffits(model.1)
+dffit[28] # -3.200223
+```
+```{r}
+cook <- cooks.distance(model.1)
+cook[28] # 3.274466
+
+detach(heightfoot)
+```
+# Hospital infection risk (two outliers, high leverages)
+
+    -Load the infection risk data.
+    -Fit a simple linear regression model to all the data.
+    -Create a scatterplot of the data and add the regression line.
+    -Display influence measures for influential points, including DFFITS, Cook's distances, and leverages (hat).
+```{r}
+infectionrisk <- read.csv("DataL11/hospital_infct_03.csv", header=T)
+attach(infectionrisk)
+head(infectionrisk)
+model <- lm(InfctRsk ~ Stay)
+summary(model)
+```
+```{r}
+# plot(x=Stay, y=InfctRsk,
+#      panel.last = lines(sort(Stay), fitted(model)[order(Stay)]))
+
+```
+```{r}
+qplot(data=infectionrisk, x=Stay, y=InfctRsk) +
+  geom_line(aes(x=Stay, y= model$fitted.values), col='blue')
+
+# fitted(model)
+# x
+# names(model)
+# model$fitted.values
+```
+
+
+```{r}
+summary(influence.measures(model))
+detach(infectionrisk)
+```
+

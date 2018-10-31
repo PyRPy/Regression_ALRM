@@ -1,0 +1,345 @@
+---
+title: "Lesson 12: Multicollinearity & Other Regression Pitfalls"
+output: html_notebook
+---
+https://onlinecourses.science.psu.edu/stat501/node/430/
+
+```{r}
+library(ggplot2)
+```
+
+# Blood pressure (multicollinearity)
+
+* Load the bloodpress data.
+* Create scatterplot matrices of the data.
+* Calculate correlations between the variables.
+```{r}
+bloodpress <- read.table("DataL12/bloodpress.txt", header=T)
+
+pairs(bloodpress[,c(2:5)])
+```
+```{r}
+pairs(bloodpress[,c(2,6:8)])
+```
+```{r}
+round(cor(bloodpress[,c(2:8)]),3)
+```
+# Uncorrelated predictors (no multicollinearity)
+
+* Load the uncorrpreds data.
+* Create a scatterplot matrix of the data.
+* Calculate the correlation between the predictors.
+* Fit a simple linear regression model of y vs x1.
+* Fit a simple linear regression model of y vs x2.
+* Fit a multiple linear regression model of y vs x1 + x2.
+* Fit a multiple linear regression model of y vs x2 + x1.
+* Use the scatter3d function in the car package to create a 3D scatterplot of the data with the fitted plane for a multiple linear regression model of y vs x1 + x2.
+
+```{r}
+uncorrpreds <- read.table("DataL12/uncorrpreds.csv", sep=",", header=T)
+pairs(uncorrpreds)
+```
+```{r}
+with(uncorrpreds, cor(x1,x2))
+```
+```{r}
+model.1 <- lm(y ~ x1, data=uncorrpreds)
+summary(model.1)
+```
+```{r}
+anova(model.1)
+```
+```{r}
+model.2 <- lm(y ~ x2, data=uncorrpreds)
+summary(model.2)
+```
+```{r}
+anova(model.2)
+```
+```{r}
+model.21 <- lm(y ~ x2 + x1, data=uncorrpreds)
+summary(model.21)
+```
+```{r}
+anova(model.21)
+```
+```{r message=FALSE}
+library(car)
+head(uncorrpreds)
+attach(uncorrpreds)
+scatter3d(y ~ x1 + x2)
+detach(uncorrpreds)
+```
+# Blood pressure (predictors with almost no multicollinearity)
+
+* Load the bloodpress data.
+* Create a scatterplot matrix of the data.
+* Fit a simple linear regression model of BP vs Stress.
+* Fit a simple linear regression model of BP vs BSA.
+* Fit a multiple linear regression model of BP vs Stress + BSA.
+* Fit a multiple linear regression model of BP vs BSA + Stress.
+* Use the scatter3d function in the car package to create a 3D scatterplot of the data with the fitted plane for a multiple linear regression model of BP vs Stress + BSA.
+```{r}
+bloodpress <- read.table("DataL12/bloodpress.txt", header=T)
+pairs(bloodpress[,c(2,5,8)])
+```
+```{r}
+model.1 <- lm(BP ~ Stress, data=bloodpress)
+summary(model.1)
+anova(model.1)
+```
+```{r}
+model.2 <- lm(BP ~ BSA, data = bloodpress)
+summary(model.2)
+anova(model.12)
+```
+```{r}
+model.21 <- lm(BP ~ BSA + Stress, data = bloodpress)
+summary(model.21)
+anova(model.21)
+```
+```{r}
+library(car)
+attach(bloodpress)
+scatter3d(BP ~ Stress + BSA)
+detach(bloodpress)
+```
+# Blood pressure (predictors with high multicollinearity)
+
+    Load the bloodpress data.
+    Create a scatterplot matrix of the data.
+    Fit a simple linear regression model of BP vs Weight.
+    Fit a simple linear regression model of BP vs BSA.
+    Fit a multiple linear regression model of BP vs Weight + BSA.
+    Fit a multiple linear regression model of BP vs BSA + Weight.
+    Use the scatter3d function in the car package to create a 3D scatterplot of the data with the fitted plane for a multiple linear regression model of BP vs Weight + BSA.
+    Predict BP for Weight=92 and BSA=2 for the two simple linear regression models and the multiple linear regression model.
+```{r}
+pairs(bloodpress[,c(2,5,4)])
+
+```
+```{r}
+model.1 <- lm(BP ~ Weight, data = bloodpress)
+summary(model.1)
+anova(model.1)
+```
+```{r}
+model.2 <- lm(BP ~ BSA, data = bloodpress)
+summary(model.2)
+anova(model.2)
+```
+```{r}
+model.12 <- lm(BP ~ Weight + BSA, data=bloodpress)
+summary(model.12)
+anova(model.12)
+```
+```{r}
+model.21 <- lm(BP ~ BSA + Weight, data = bloodpress)
+summary(model.21)
+anova(model.21)
+```
+```{r}
+attach(bloodpress)
+scatter3d(BP ~ Weight + BSA)
+detach(bloodpress)
+```
+```{r}
+predict(model.1, interval="prediction",
+        newdata=data.frame(Weight=92))
+
+predict(model.2, interval="prediction",
+        newdata=data.frame(BSA=2))
+
+predict(model.12, interval="prediction",
+        newdata=data.frame(Weight=92, BSA=2))
+```
+# Poverty and teen birth rate (high multicollinearity)
+
+    Load the poverty data and remove the District of Columbia.
+    Create a scatterplot matrix of the data.
+    Fit a simple linear regression model of PovPct vs Brth15to17.
+    Fit a simple linear regression model of PovPct vs Brth18to19.
+    Fit a multiple linear regression model of PovPct vs Brth15to17 + Brth18to19.
+
+```{r}
+poverty <- read.table("DataL12/poverty.txt", header=T)
+poverty <- poverty[poverty$Location!="District_of_Columbia",]
+pairs(poverty[,c(2:4)])
+```
+```{r}
+model.1 <- lm(PovPct ~ Brth15to17, data=poverty)
+summary(model.1)
+```
+```{r}
+model.2 <- lm(PovPct ~ Brth18to19, data=poverty)
+summary(model.2)
+```
+```{r}
+model.12 <- lm(PovPct ~ Brth15to17 + Brth18to19, data=poverty)
+summary(model.12)
+```
+# Blood pressure (high multicollinearity)
+
+    Load the bloodpress data.
+    Fit a multiple linear regression model of BP vs Age + Weight + BSA + Dur + Pulse + Stress.
+    Use the vif function in the car package to calculate variance inflation factors.
+    Fit a multiple linear regression model of Weight vs Age + BSA + Dur + Pulse + Stress and confirm the VIF value for Weight as 1/(1-R2) for this model.
+    Fit a multiple linear regression model of BP vs Age + Weight + Dur + Stress.
+    Use the vif function in the car package to calculate variance inflation factors.
+```{r}
+model.1 <- lm(BP ~ Age + Weight + BSA + Dur + Pulse + Stress, data = bloodpress)
+summary(model.1)
+```
+```{r}
+# library(car)
+vif(model.1)
+```
+```{r}
+model.2 <- lm(Weight ~ Age + BSA + Dur + Pulse + Stress, data=bloodpress)
+summary(model.2)
+```
+```{r}
+1/(1-summary(model.2)$r.squared) # 8.417035
+```
+```{r}
+model.3 <- lm(BP ~ Age + Weight + Dur + Stress, data=bloodpress)
+summary(model.3)
+```
+```{r}
+vif(model.3)
+```
+# Allen Cognitive Level study (reducing data-based multicollinearity)
+
+    Load the sampled allentestn23 data.
+    Create a scatterplot matrix of the data.
+    Calculate the correlation between Vocab and Abstract.
+    Fit a multiple linear regression model of ACL vs SDMT + Vocab + Abstract.
+    Use the vif function in the car package to calculate variance inflation factors.
+    Repeat for the full allentest data.
+```{r}
+allentestn23 <- read.table("DataL12/allentestn23.csv", sep=",",  header=T)
+pairs(allentestn23[,2:5])
+```
+```{r}
+attach(allentestn23)
+cor(Vocab, Abstract)
+detach(allentestn23)
+```
+```{r}
+model.1 <- lm(ACL ~ SDMT + Vocab + Abstract, data=allentestn23)
+summary(model.1)
+vif(model.1)
+```
+```{r}
+allentest <- read.table("DataL12/allentest.txt", header=T)
+
+pairs(allentest[,2:5])
+```
+```{r}
+attach(allentest)
+cor(Vocab, Abstract)
+detach(allentest)
+```
+```{r}
+model.1 <- lm(ACL ~ SDMT + Vocab + Abstract, data=allentest)
+summary(model.1)
+vif(model.1)
+```
+# Exercise and immunity (reducing structural multicollinearity)
+
+    Load the exerimmun data.
+    Create a scatterplot of igg vs oxygen.
+    Calculate an oxygen-squared variable named oxygensq.
+    Fit a quadratic regression model of igg vs oxygen + oxygensq.
+    Add a quadratic regression line to the scatterplot.
+    Use the vif function in the car package to calculate variance inflation factors.
+    Create a scatterplot of oxygensq vs oxygen and calculate the correlation.
+    Calculate a centered oxygen variable named oxcent and an oxcent-squared variable named oxcentsq.
+    Fit a quadratic regression model of igg vs oxcent + oxcentsq.
+    Use the vif function in the car package to calculate variance inflation factors.
+    Create a scatterplot of igg vs oxcent with the quadratic regression line added.
+    Fit a simple linear regression model of igg vs oxcent.
+    Confirm the equivalence of the original quadratic and centered quadratic models by transforming the regression parameter estimates.
+    Create a residual vs fits plot for the centered quadratic model.
+    Create a normal probability plot of the residuals for the centered quadratic model.
+    Predict igg for oxygen = 70 using the centered quadratic model.
+```{r}
+exerimmun <- read.table("DataL12/exerimmun.csv", sep=","  ,header=T)
+qplot(data=exerimmun, oxygen, igg)
+```
+```{r}
+exerimmun$oxygensq <- exerimmun$oxygen^2
+
+model.1 <- lm(igg ~ oxygen + oxygensq, data=exerimmun)
+
+qplot(data=exerimmun, x=oxygen, y=igg) +
+  geom_line(aes(x=oxygen, y=model.1$fitted.values), col="blue")
+```
+```{r}
+summary(model.1)
+vif(model.1)
+```
+```{r}
+qplot(data=exerimmun, oxygen, oxygensq)
+```
+```{r}
+with(data=exerimmun, cor(oxygen, oxygensq))
+```
+```{r}
+exerimmun$oxcent <- exerimmun$oxygen-mean(exerimmun$oxygen)
+exerimmun$oxcentsq <- exerimmun$oxcent^2
+qplot(data=exerimmun, oxcent, oxcentsq)
+```
+```{r}
+with(data=exerimmun, cor(oxcent, oxcentsq))
+```
+```{r}
+model.2 <- lm(igg ~ oxcent + oxcentsq, data=exerimmun)
+summary(model.2)
+vif(model.2)
+```
+```{r}
+qplot(data=exerimmun, x=oxygen, y=igg) +
+  geom_line(aes(x=oxygen, y=model.2$fitted.values), col="red")
+```
+```{r}
+model.3 <- lm(igg ~ oxcent, data=exerimmun)
+summary(model.3)
+```
+```{r}
+with(data=exerimmun, 
+coef(model.2)[1]-coef(model.2)[2]*mean(oxygen)+coef(model.2)[3]*mean(oxygen)^2)
+
+with(data=exerimmun,
+coef(model.2)[2]-2*coef(model.2)[3]*mean(oxygen))
+
+with(data=exerimmun, coef(model.2)[3] )
+```
+```{r}
+coef(model.1)
+```
+```{r}
+qplot(x=fitted(model.2), y=residuals(model.2)) +
+   geom_hline(yintercept = 0)
+```
+```{r}
+qqnorm(residuals(model.2), main="", datax=TRUE)
+qqline(residuals(model.2), datax=TRUE)
+
+```
+```{r}
+with(data=exerimmun, 
+predict(model.2, interval="prediction",
+        newdata=data.frame(oxcent=70-mean(oxygen), oxcentsq=(70-mean(oxygen))^2))
+)
+```
+df <- data.frame(y = rt(200, df = 5))
+p <- ggplot(df, aes(sample = y))
+p + stat_qq() + stat_qq_line()
+
+```{r}
+df <- data.frame(x = residuals(model.2))
+p <- ggplot(df, aes(sample = x))
+p + stat_qq() + stat_qq_line()
+```
+
