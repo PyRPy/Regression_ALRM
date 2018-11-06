@@ -1,31 +1,27 @@
 ---
 title: "Lesson 9: Data Transformations"
 output: html_notebook
+editor_options: 
+  chunk_output_type: console
 ---
 
-Word recall (log-transforming a predictor)
+# Word recall (log-transforming a predictor)
 
-    Load the wordrecall data.
-    Fit a simple linear regression model of prop on time.
-    Display scatterplot of the data and add the regression line.
-    Display residual plot with fitted (predicted) values on the horizontal axis.
-    Display normal probability plot of the residuals and add a diagonal line to the plot. The argument "datax" determines which way round to plot the axes (false by default, which plots the data on the vertical axis, or true, which plots the data on the horizontal axis).
-    Load the nortest package to access Anderson-Darling normality test.
-    Create log(time) variable and fit a simple linear regression model of prop on log(time).
-    Repeat diagnostic plots and normality test.
-    Create prop^-1.25 variable and fit a simple linear regression model of prop^-1.25 on time.
-    Repeat diagnostic plots and normality test.
-    Use prop on log(time) model to find:
-        95% prediction interval for prop at time 1000.
-        95% confidence interval for expected change in prop for a 10-fold increase in time.
+Load the wordrecall data.
 ```{r}
 wordrecall <- read.table("DataL9/wordrecall.txt", header=T)
 head(wordrecall)
 attach(wordrecall)
 
+```
+Fit a simple linear regression model of prop on time.
+```{r}
 model.1 <- lm(prop ~ time)
 summary(model.1)
 ```
+Display scatterplot of the data and add the regression line.
+Display residual plot with fitted (predicted) values on the horizontal axis.
+Display normal probability plot of the residuals and add a diagonal line to the plot. The argument "datax" determines which way round to plot the axes (false by default, which plots the data on the vertical axis, or true, which plots the data on the horizontal axis).
 ```{r}
 par(mfrow=c(2,2))
 plot(x=time, y=prop, ylim=c(-0.1, 0.9),
@@ -37,16 +33,19 @@ plot(x=fitted(model.1), y=residuals(model.1),
 qqnorm(residuals(model.1), main="", datax=TRUE)
 qqline(residuals(model.1), datax=TRUE)
 ```
+Load the nortest package to access Anderson-Darling normality test.
 ```{r}
 library(nortest)
-ad.test(residuals(model.1)) # A = 0.262, p-value = 0.6426
+ad.test(residuals(model.1))
 ```
+Create log(time) variable and fit a simple linear regression model of prop on log(time).
 ```{r}
 lntime <- log(time)
 
 model.2 <- lm(prop ~ lntime)
 summary(model.2)
 ```
+Repeat diagnostic plots and normality test.
 ```{r}
 par(mfrow=c(2,2))
 plot(x=lntime, y=prop,
@@ -59,14 +58,17 @@ qqnorm(residuals(model.2), main="", datax=TRUE)
 qqline(residuals(model.2), datax=TRUE)
 ```
 ```{r}
-ad.test(residuals(model.2)) # A = 0.3216, p-value = 0.4869
+library(nortest)
+ad.test(residuals(model.2)) # A = 0.262, p-value = 0.6426
 ```
+Create prop^-1.25 variable and fit a simple linear regression model of prop^-1.25 on time.
 ```{r}
 prop1.25 <- prop^-1.25
 
 model.3 <- lm(prop1.25 ~ time)
 summary(model.3)
-```
+```    
+Repeat diagnostic plots and normality test.
 ```{r}
 par(mfrow=c(2,2))
 plot(x=time, y=prop1.25,
@@ -79,37 +81,34 @@ qqnorm(residuals(model.3), main="", datax=TRUE)
 qqline(residuals(model.3), datax=TRUE)
 ```
 ```{r}
-ad.test(residuals(model.3)) # A = 1.191, p-value = 0.002584
+ad.test(residuals(model.3)) 
 ```
+Use prop on log(time) model to find:
+  95% prediction interval for prop at time 1000.
+  95% confidence interval for expected change in prop for a 10-fold increase in time.
 ```{r}
 predict(model.2, interval="prediction",
         newdata=data.frame(lntime=log(1000)))
 ```
 ```{r}
-confint(model.2)[2,]*log(10) # 95% CI for 10-fold increase in time
+confint(model.2)[2,]*log(10) # 95% CI for 10-fold increase in time, beta1*ln(10)
 ```
-Mammal gestation (log-transforming the response)
-
-    Load the mammgest data.
-    Fit a simple linear regression model of Gestation on Birthwgt.
-    Display scatterplot of the data and add the regression line.
-    Display residual plot with fitted (predicted) values on the horizontal axis.
-    Display normal probability plot of the residuals and add a diagonal line to the plot.
-    Apply the Anderson-Darling normality test using nortest package.
-    Create log(Gestation) variable and fit a simple linear regression model of log(Gestation) on Birthwgt.
-    Repeat diagnostic plots and normality test.
-    Use log(Gestation) on Birthwgt model to find:
-        95% prediction interval for Gestation for a Birthwgt of 50.
-        95% confidence interval for proportional change in median Gestation for a 1 pound increase in Birthwgt.
-        95% confidence interval for proportional change in median Gestation for a 10 pound increase in Birthwgt.
-
+# Mammal gestation (log-transforming the response)
+(Again, transforming the y values should be considered when non-normality and/or unequal variances are the main problems with the model.)
+Load the mammgest data.
 ```{r}
 mammgest <- read.table("DataL9/mammgest.txt", header=T)
 attach(mammgest)
-
+head(mammgest)
+```
+Fit a simple linear regression model of Gestation on Birthwgt.
+```{r}
 model.1 <- lm(Gestation ~ Birthwgt)
 summary(model.1)
-```
+```   
+Display scatterplot of the data and add the regression line.
+Display residual plot with fitted (predicted) values on the horizontal axis.
+Display normal probability plot of the residuals and add a diagonal line to the plot.
 ```{r}
 par(mfrow=c(2,2))
 plot(x=Birthwgt, y=Gestation,
@@ -120,17 +119,19 @@ plot(x=fitted(model.1), y=residuals(model.1),
 
 qqnorm(residuals(model.1), main="", datax=TRUE)
 qqline(residuals(model.1), datax=TRUE)
-
 ```
+Apply the Anderson-Darling normality test using nortest package.
 ```{r}
 ad.test(residuals(model.1)) # A = 0.3116, p-value = 0.503
 ```
+Create log(Gestation) variable and fit a simple linear regression model of log(Gestation) on Birthwgt.
 ```{r}
 lnGest <- log(Gestation)
 
 model.2 <- lm(lnGest ~ Birthwgt)
 summary(model.2)
 ```
+Repeat diagnostic plots and normality test.
 ```{r}
 par(mfrow=c(2,2))
 plot(x=Birthwgt, y=lnGest,
@@ -145,6 +146,10 @@ qqline(residuals(model.2), datax=TRUE)
 ```{r}
 ad.test(residuals(model.2)) # A = 0.3135, p-value = 0.4963
 ```
+Use log(Gestation) on Birthwgt model to find:
+95% prediction interval for Gestation for a Birthwgt of 50.
+95% confidence interval for proportional change in median Gestation for a 1 pound increase in Birthwgt.
+95% confidence interval for proportional change in median Gestation for a 10 pound increase in Birthwgt.
 ```{r}
 exp(predict(model.2, interval="prediction",
             newdata=data.frame(Birthwgt=50)))
@@ -153,40 +158,35 @@ exp(predict(model.2, interval="prediction",
 # proportional change in median gestation for 1-unit increase in birthwgt
 exp(coefficients(model.2)[2]) # 1.010465
 exp(confint(model.2)[2,]) # 95% CI
-#    2.5 %   97.5 % 
-# 1.006547 1.014398 
 ```
 ```{r}
 # proportional change in median gestation for 10-unit increase in birthwgt
 exp(10*coefficients(model.2)[2]) # 1.109714
 exp(10*confint(model.2)[2,]) # 95% CI
-#    2.5 %   97.5 % 
-# 1.067429 1.153674 
-
 detach(mammgest)
 ```
-Shortleaf pine trees (log-transforming both response and predictor)
+# Shortleaf pine trees (log-transforming both response and predictor)
+(You might have to do this when everything seems wrong — when the regression function is not linear and the error terms are not normal and have unequal variances. In general (although not always!))
+* Transforming the y values corrects problems with the error terms (and may help the non-linearity).
+* Transforming the x values primarily corrects the non-linearity.
 
-    Load the shortleaf data.
-    Fit a simple linear regression model of Vol on Diam.
-    Display scatterplot of the data and add the regression line.
-    Display residual plot with fitted (predicted) values on the horizontal axis.
-    Display normal probability plot of the residuals and add a diagonal line to the plot.
-    Apply the Anderson-Darling normality test using the nortest package.
-    Create log(Diam) variable and fit a simple linear regression model of Vol on log(Diam).
-    Repeat diagnostic plots and normality test.
-    Create log(Vol) variable and fit a simple linear regression model of log(Vol) on log(Diam).
-    Repeat diagnostic plots and normality test.
-    Use log(Vol) on log(Diam) model to find:
-        95% confidence interval for median Vol for a Diam of 10.
-        95% confidence interval for proportional change in median Vol for a 2-fold increase in Diam.
+Load the shortleaf data.
+Fit a simple linear regression model of Vol on Diam.
+Display scatterplot of the data and add the regression line.
+Display residual plot with fitted (predicted) values on the horizontal axis.
+Display normal probability plot of the residuals and add a diagonal line to the plot.
+Apply the Anderson-Darling normality test using the nortest package.
 ```{r}
 shortleaf <- read.table("DataL9/shortleaf.txt", header=T)
 attach(shortleaf)
-
+head(shortleaf)
+plot(Vol, Diam) # always plot it for inspection
+```
+```{r}
 model.1 <- lm(Vol ~ Diam)
 summary(model.1)
 ```
+
 ```{r}
 par(mfrow=c(2,2))
 plot(x=Diam, y=Vol,
@@ -201,6 +201,8 @@ qqline(residuals(model.1), datax=TRUE)
 ```{r}
 ad.test(residuals(model.1)) # A = 0.9913, p-value = 0.01215
 ```
+Create log(Diam) variable and fit a simple linear regression model of Vol on log(Diam).
+Repeat diagnostic plots and normality test.
 ```{r}
 lnDiam <- log(Diam)
 
@@ -221,6 +223,8 @@ qqline(residuals(model.2), datax=TRUE)
 ```{r}
 ad.test(residuals(model.2)) # A = 2.3845, p-value = 4.273e-06
 ```
+Create log(Vol) variable and fit a simple linear regression model of log(Vol) on log(Diam).
+Repeat diagnostic plots and normality test.
 ```{r}
 lnVol <- log(Vol)
 
@@ -242,6 +246,9 @@ qqline(residuals(model.3), datax=TRUE)
 ```{r}
 ad.test(residuals(model.3)) # A = 0.5309, p-value = 0.1692
 ```
+Use log(Vol) on log(Diam) model to find:
+    95% confidence interval for median Vol for a Diam of 10.
+    95% confidence interval for proportional change in median Vol for a 2-fold increase in Diam.
 ```{r}
 exp(predict(model.3, interval="confidence",
             newdata=data.frame(lnDiam=log(10))))
@@ -250,26 +257,16 @@ exp(predict(model.3, interval="confidence",
 # proportional change in median Vol for 2-fold increase in Diam
 2^(coefficients(model.3)[2]) # 5.915155
 2^(confint(model.3)[2,]) # 95% CI
-```
-```{r}
 detach(shortleaf)
 ```
-Underground air quality (interactions)
-
-    Load the swallows data.
-    Load the car package to access 3D scatterplots.
-    Create interaction variables and fit a multiple linear regression model of Vent on O2 + CO2 + Type + TypeO2 + TypeCO2 + CO2O2.
-    Use anova function to display anova table with sequential (type I) sums of squares.
-    Calculate partial F-statistic and p-value.
-    Display residual plot with fitted (predicted) values on the horizontal axis.
-    Fit a multiple linear regression model of Vent on O2 + CO2 + Type.
-    Display residual plot with fitted (predicted) values on the horizontal axis.
-    Display normal probability plot of the residuals and add a diagonal line to the plot.
-    Apply the Anderson-Darling normality test using the nortest package.
+# Underground air quality (interactions)
+Load the swallows data.
+Load the car package to access 3D scatterplots.
 ```{r}
 swallows <- read.table("DataL9/allswallows.txt", header=T)
 attach(swallows)
 head(swallows)
+str(swallows)
 ```
 ```{r}
 library(car)
@@ -277,6 +274,7 @@ scatter3d(Vent ~ O2 + CO2, subset=Type==1) # adult
 scatter3d(Vent ~ O2 + CO2, subset=Type==0) # nestling
 scatter3d(Vent ~ O2 + CO2, subset=Type==0, revolutions=3, speed=0.5, grid=F)
 ```
+Create interaction variables and fit a multiple linear regression model of Vent on O2 + CO2 + Type + TypeO2 + TypeCO2 + CO2O2.
 ```{r}
 TypeO2 <- Type*O2
 TypeCO2 <- Type*CO2
@@ -286,6 +284,8 @@ CO2O2 <- CO2*O2
 model.1 <- lm(Vent ~ O2 + CO2 + Type + TypeO2 + TypeCO2 + CO2O2)
 summary(model.1)
 ```
+Use anova function to display anova table with sequential (type I) sums of squares.
+Calculate partial F-statistic and p-value.
 ```{r}
 anova(model.1) # Sequential (type I) SS
 ```
@@ -293,10 +293,15 @@ anova(model.1) # Sequential (type I) SS
 ((14735+2884+22664)/3)/27419 # F-stat = 0.4897212
 pf(0.49, 3, 233, lower.tail=F) # p-value = 0.6895548
 ```
+Display residual plot with fitted (predicted) values on the horizontal axis.
 ```{r}
 plot(x=fitted(model.1), y=residuals(model.1),
      panel.last = abline(h=0, lty=2))
 ```
+Fit a multiple linear regression model of Vent on O2 + CO2 + Type.
+Display residual plot with fitted (predicted) values on the horizontal axis.
+Display normal probability plot of the residuals and add a diagonal line to the plot.
+Apply the Anderson-Darling normality test using the nortest package.
 ```{r}
 model.2 <- lm(Vent ~ O2 + CO2 + Type)
 summary(model.2)
@@ -314,25 +319,24 @@ ad.test(residuals(model.2)) # A = 0.3175, p-value = 0.5358
 
 detach(swallows)
 ```
-Bluegill fish (polynomial regression)
+# Bluegill fish (polynomial regression)
 
-    Load the bluegills data.
-    Display a scatterplot of the data.
-    Create age-squared variable and fit a multiple linear regression model of length on age + agesq.
-    Add quadratic regression line to the scatterplot.
-    Find 95% prediction interval for length for an age of 5.
+Load the bluegills data.
+Display a scatterplot of the data.
 ```{r}
 bluegills <- read.table("DataL9/bluegills.txt", header=T)
 attach(bluegills)
 
 plot(x=age, y=length)
 ```
+Create age-squared variable and fit a multiple linear regression model of length on age + agesq.
 ```{r}
 agesq <- age^2
 
 model <- lm(length ~ age + agesq)
 summary(model)
 ```
+Add quadratic regression line to the scatterplot.
 ```{r}
 newX <- seq(min(age), max(age), length=100)
 newXsq <- newX**2
@@ -343,21 +347,16 @@ plot(x=age, y=length,
                                 newdata=data.frame(age=newX, agesq=newXsq))))
 
 ```
+Find 95% prediction interval for length for an age of 5.
 ```{r}
 predict(model, interval="prediction",
         newdata=data.frame(age=5, agesq=25))
-```
-
-```{r}
 detach(bluegills)
 ```
-Experiment yield (polynomial regression)
-
-    Load the yield data.
-    Fit a simple linear regression model of Yield on Temp.
-    Display a scatterplot of the data and add the simple linear regression line.
-    Create Temp-squared variable and fit a multiple linear regression model of Yield on Temp + Tempsq.
-    Display a scatterplot of the data and add quadratic regression line to the scatterplot.
+# Experiment yield (polynomial regression)
+Load the yield data.
+Fit a simple linear regression model of Yield on Temp.
+Display a scatterplot of the data and add the simple linear regression line.
 ```{r}
 yield <- read.csv("DataL9/yield.csv", header=T)
 attach(yield)
@@ -371,6 +370,8 @@ plot(x=Temp, y=Yield,
      panel.last = lines(sort(Temp), fitted(model.1)[order(Temp)]))
 
 ```
+Create Temp-squared variable and fit a multiple linear regression model of Yield on Temp + Tempsq.
+Display a scatterplot of the data and add quadratic regression line to the scatterplot.
 ```{r}
 Tempsq <- Temp^2
 
@@ -388,16 +389,17 @@ plot(x=Temp, y=Yield,
 
 detach(yield)
 ```
-Chemical odor (polynomial regression)
-
-    Load the odor data.
-    Create squared variables and fit a multiple linear regression model of Odor on Temp + Ratio + Height + Tempsq + Ratiosq + Heightsq.
-    Fit a multiple linear regression model of Odor on Temp + Ratio + Height + Tempsq + Ratiosq.
+# Chemical odor (polynomial regression)
+Load the odor data.
 ```{r}
 odor <- read.csv("DataL9/odor.csv", header=T)
 attach(odor)
 head(odor)
-
+pairs(odor)
+```
+Create squared variables and fit a multiple linear regression model of Odor on Temp + Ratio + Height + Tempsq + Ratiosq + Heightsq.
+Fit a multiple linear regression model of Odor on Temp + Ratio + Height + Tempsq + Ratiosq.
+```{r}
 Tempsq <- Temp^2
 Ratiosq <- Ratio^2
 Heightsq <- Height^2
@@ -405,12 +407,11 @@ Heightsq <- Height^2
 model.1 <- lm(Odor ~ Temp + Ratio + Height + Tempsq + Ratiosq + Heightsq)
 summary(model.1)
 ```
+Height square is least signifiant, so drop this term
 ```{r}
 model.2 <- lm(Odor ~ Temp + Ratio + Height + Tempsq + Ratiosq)
 summary(model.2)
-```
-```{r}
 detach(odor)
+# Considering the 'heirarchy' rule, keep temp term 
 ```
-
 
