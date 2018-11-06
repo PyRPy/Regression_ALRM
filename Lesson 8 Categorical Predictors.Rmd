@@ -141,6 +141,106 @@ model.3 <- lm(y ~ age + x2 + x3, data=depression)
 anova(model.3, model.1)
 detach(depression) # may should not use this anymore
 ```
+https://onlinecourses.science.psu.edu/stat501/node/383/
+# Real estate air conditioning (2-level categorical predictor, interaction model, transformations)
 
+* Load the realestate data.
+```{r}
+realestate <- read.table("DataL8/realestate.txt", header=T)
+# attach(realestate)
+```
+* Create an interaction variable and fit a multiple linear regression model of SalePrice on SqFeet + Air + SqFeet.Air.
+```{r}
+realestate$SqFeet.Air <- realestate$SqFeet*realestate$Air
+model.1 <- lm(SalePrice ~ SqFeet + Air + SqFeet.Air, data=realestate)
+summary(model.1)
+```
+* Display scatterplot of SalePrice vs SqFeet with points marked by Air and add non-parallel regression lines representing Air=0 and Air=1.
+```{r}
+with(data=realestate, 
+plot(x=SqFeet, y=SalePrice, 
+     col=ifelse(Air, "red", "blue"),
+     panel.last = c(lines(sort(SqFeet[Air==0]),
+                          fitted(model.1)[Air==0][order(SqFeet[Air==0])],
+                          col="blue"),
+                    lines(sort(SqFeet[Air==1]),
+                          fitted(model.1)[Air==1][order(SqFeet[Air==1])],
+                          col="red")))) 
+legend("topleft", col=c("blue", "red"), pch=1, lty=1, inset=0.02,
+       legend=c("No air conditioning", "Air conditioning"))
+# this is for 'with'
+```
+* Display residual plot with fitted (predicted) values on the horizontal axis.
+```{r}
+plot(x=fitted(model.1), y=residuals(model.1),
+     xlab="Fitted values", ylab="Residuals",
+     panel.last = abline(h=0, lty=2))
+
+```
+
+* Create log(SalePrice), log(SqFeet), and log(SqFeet).Air variables and fit a multiple linear regression model of log(SalePrice) on log(SqFeet) + Air + log(SqFeet).Air.
+```{r}
+realestate$lnSalePrice <- log(realestate$SalePrice)
+realestate$lnSqFeet <- log(realestate$SqFeet)
+realestate$lnSqFeet.Air <- realestate$lnSqFeet*realestate$Air
+
+model.2 <- lm(lnSalePrice ~ lnSqFeet + Air + lnSqFeet.Air, data=realestate)
+
+```
+* Display scatterplot of log(SalePrice) vs log(SqFeet) with points marked by Air and add non-parallel regression lines representing Air=0 and Air=1.
+```{r}
+with(data=realestate, 
+plot(x=lnSqFeet, y=lnSalePrice, 
+     col=ifelse(Air, "red", "blue"),
+     panel.last = c(lines(sort(lnSqFeet[Air==0]),
+                          fitted(model.2)[Air==0][order(lnSqFeet[Air==0])],
+                          col="blue"),
+                    lines(sort(lnSqFeet[Air==1]),
+                          fitted(model.2)[Air==1][order(lnSqFeet[Air==1])],
+                          col="red"))))
+legend("topleft", col=c("blue", "red"), pch=1, lty=1, inset=0.02,
+       legend=c("No air conditioning", "Air conditioning"))
+
+```
+* Display residual plot with fitted (predicted) values on the horizontal axis.
+```{r}
+plot(x=fitted(model.2), y=residuals(model.2),
+     xlab="Fitted values", ylab="Residuals",
+     panel.last = abline(h=0, lty=2))
+
+```
+# Hospital infection risk (4-level categorical predictor, additive model)
+
+Load the infectionrisk data and select observations with Stay <= 14.
+Create indicator variables for regions.
+```{r}
+infectionrisk <- read.table("DataL8/infectionrisk.txt", header=T)
+infectionrisk <- infectionrisk[infectionrisk$Stay<=14,]
+# attach(infectionrisk)
+
+infectionrisk$i1 <- ifelse(infectionrisk$Region==1,1,0) # NE
+infectionrisk$i2 <- ifelse(infectionrisk$Region==2,1,0) # NC
+infectionrisk$i3 <- ifelse(infectionrisk$Region==3,1,0) # S
+infectionrisk$i4 <- ifelse(infectionrisk$Region==4,1,0) # W
+
+```
+
+Fit a multiple linear regression model of InfctRsk on Stay + Xray + i2 + i3 + i4.
+```{r}
+head(infectionrisk)
+model.1 <- lm(InfctRsk ~ Stay + Xray + i2 + i3 + i4, data = infectionrisk)
+summary(model.1)
+```
+
+Conduct an F-test to see if at least one of i2, i3, and i4 are useful (conclusion: the regression functions differ by region).
+```{r}
+model.2 <- lm(InfctRsk ~ Stay + Xray, data = infectionrisk)
+anova(model.2, model.1)
+```
+Conduct an F-test to see if at least one of i2 and i3 are useful (conclusion: only the west region differs).
+```{r}
+model.3 <- lm(InfctRsk ~ Stay + Xray + i4, data=infectionrisk)
+anova(model.3, model.1)
+```
 
 
