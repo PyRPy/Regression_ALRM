@@ -1,0 +1,360 @@
+---
+title: "Lesson 10: Model Building"
+output: html_notebook
+---
+
+https://onlinecourses.science.psu.edu/stat501/node/428/
+```{r}
+martian <- read.csv("DataL10/martian.csv", header=T)
+head(martian)
+attach(martian)
+
+model.1 <- lm(weight ~ height + water)
+summary(model.1)
+```
+```{r}
+model.2 <- lm(weight ~ height)
+summary(model.2)
+```
+```{r}
+plot(x=height, y=weight, col=water/10+1,
+     panel.last = c(lines(sort(height[water==0]),
+                          fitted(model.1)[water==0][order(height[water==0])],
+                          col=1),
+                    lines(sort(height[water==10]),
+                          fitted(model.1)[water==10][order(height[water==10])],
+                          col=2),
+                    lines(sort(height[water==20]),
+                          fitted(model.1)[water==20][order(height[water==20])],
+                          col=3),
+                    lines(sort(height), fitted(model.2)[order(height)], col=4)))
+legend("topleft", col=1:4, pch=1, lty=1, inset=0.02,
+       legend=c("Model 1, water=0", "Model 1, water=10",
+                "Model 1, water=20", "Model 2"))
+
+detach(martian)
+```
+Cement hardening (variable selection using stepwise regression)
+
+    Load the cement data.
+    Create a scatterplot matrix of the data.
+    Use the add1 and drop1 functions to conduct stepwise regression.
+```{r message=FALSE}
+cement <- read.table("DataL10/cement.txt", header=T)
+attach(cement)
+
+pairs(cement, lower.panel = NULL)
+```
+```{r}
+model.0 <- lm(y ~ 1)
+add1(model.0, ~ x1 + x2 + x3 + x4, test="F")
+```
+```{r}
+model.4 <- lm(y ~ x4)
+add1(model.4, ~ . + x1 + x2 + x3, test="F")
+```
+```{r}
+model.14 <- lm(y ~ x1 + x4)
+drop1(model.14, ~ ., test="F")
+```
+```{r}
+add1(model.14, ~ . + x2 + x3, test="F")
+```
+```{r}
+model.124 <- lm(y ~ x1 + x2 + x4)
+drop1(model.124, ~ ., test="F")
+```
+```{r}
+model.12 <- lm(y ~ x1 + x2)
+add1(model.12, ~ . + x3 + x4, test="F")
+detach(cement)
+```
+IQ and body size (variable selection using stepwise regression)
+
+    Load the iqsize data.
+    Create a scatterplot matrix of the data.
+    Use the add1 and drop1 functions to conduct stepwise regression.
+```{r message=FALSE}
+iqsize <- read.table("DataL10/iqsize.txt", header=T)
+attach(iqsize)
+
+pairs(iqsize, lower.panel = NULL)
+```
+```{r}
+model.0 <- lm(PIQ ~ 1)
+add1(model.0, ~ Brain + Height + Weight, test="F")
+```
+```{r}
+model.1 <- lm(PIQ ~ Brain)
+add1(model.1, ~ . + Height + Weight, test="F")
+```
+```{r}
+model.12 <- lm(PIQ ~ Brain + Height)
+drop1(model.12, ~ ., test="F")
+```
+```{r}
+add1(model.12, ~ . + Weight, test="F")
+detach(iqsize)
+```
+Blood pressure (variable selection using stepwise regression)
+
+    Load the bloodpress data.
+    Create scatterplot matrices of the data.
+    Use the add1 and drop1 functions to conduct stepwise regression.
+
+```{r message=FALSE}
+bloodpress <- read.table("DataL10/bloodpress.txt", header=T)
+attach(bloodpress)
+
+pairs(bloodpress[,c(2:5)])
+```
+```{r}
+pairs(bloodpress[,c(2,6:8)])
+```
+```{r}
+model.0 <- lm(BP  ~ 1)
+add1(model.0, ~ Age + Weight + BSA + Dur + Pulse + Stress, test="F")
+```
+```{r}
+model.2 <- lm(BP ~ Weight)
+add1(model.2, ~ . + Age + BSA + Dur + Pulse + Stress, test="F")
+```
+```{r}
+model.12 <- lm(BP ~ Age + Weight)
+drop1(model.12, ~ ., test="F")
+```
+```{r}
+add1(model.12, ~ . + BSA + Dur + Pulse + Stress, test="F")
+```
+```{r}
+model.123 <- lm(BP ~ Age + Weight + BSA)
+drop1(model.123, ~ ., test="F")
+```
+```{r}
+add1(model.123, ~ . + Dur + Pulse + Stress, test="F")
+detach(bloodpress)
+```
+Cement hardening (variable selection using best subsets regression)
+
+    Load the cement data.
+    Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression). Note that the nbest=2 argument returns the best two models with 1, 2, ..., k predictors.
+    Fit models with all four predictors (assumed unbiased) and just two predictors to retrieve the information needed to calculate Cp for the model with just two predictors by hand.
+    Fit model with x1, x2, and x4 and note the variance inflation factors for x2 and x4 are very high.
+    Fit model with x1, x2, and x3 and note the variance inflation factors are acceptable.
+    Fit model with x1 and x2 and note the variance inflation factors are acceptable, adjusted R2 is high, and a residual analysis and normality test yields no concerns.
+```{r message=FALSE}
+cement <- read.table("DataL10/cement.txt", header=T)
+attach(cement)
+
+library(leaps)
+
+subset <- regsubsets(y ~ x1 + x2 + x3 + x4, method="exhaustive", nbest=2, data=cement)
+cbind(summary(subset)$outmat, round(summary(subset)$adjr2, 3), round(summary(subset)$cp, 1))
+```
+```{r}
+model.1234 <- lm(y ~ x1 + x2 + x3 + x4)
+model.12 <- lm(y ~ x1 + x2)
+```
+```{r}
+SSE.k <- sum(residuals(model.12)^2) # SSE_k = 57.90448
+MSE.all <- summary(model.1234)$sigma^2 # MSE_all = 5.982955
+params <- summary(model.12)$df[1] # k+1 = 3
+n <- sum(summary(model.1234)$df[1:2]) # n = 13
+SSE.k/MSE.all + 2*params - n # Cp = 2.678242
+```
+```{r}
+model.14 <- lm(y ~ x1 + x4)
+SSE.k <- sum(residuals(model.14)^2) # SSE_k = 74.76211
+params <- summary(model.14)$df[1] # k+1 = 3
+SSE.k/MSE.all + 2*params - n # Cp = 5.495851
+```
+```{r}
+model.124 <- lm(y ~ x1 + x2 + x4)
+library(car)
+vif(model.124)
+```
+```{r}
+model.123 <- lm(y ~ x1 + x2 + x3)
+vif(model.123)
+```
+```{r}
+summary(model.12)
+```
+```{r}
+vif(model.12)
+```
+```{r}
+plot(x=fitted(model.12), y=rstandard(model.12),
+     panel.last = abline(h=0, lty=2))
+
+```
+```{r}
+qqnorm(rstandard(model.12), main="", datax=TRUE)
+qqline(rstandard(model.12), datax=TRUE)
+```
+```{r}
+library(nortest)
+ad.test(rstandard(model.12)) # A = 0.6136, p-value = 0.08628
+
+detach(cement)
+```
+IQ and body size (variable selection using best subsets regression)
+
+    Load the iqsize data.
+    Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression).
+    Fit model with Brain and Height and note the variance inflation factors are acceptable, adjusted R2 is as good as it gets with this dataset, and a residual analysis and normality test yields no concerns.
+```{r}
+iqsize <- read.table("DataL10/iqsize.txt", header=T)
+attach(iqsize)
+
+subset <- regsubsets(PIQ ~ Brain + Height + Weight, method="exhaustive", nbest=2, data=iqsize)
+cbind(summary(subset)$outmat, round(summary(subset)$adjr2, 3), round(summary(subset)$cp, 1))
+```
+```{r}
+model.12 <- lm(PIQ ~ Brain + Height)
+summary(model.12)
+```
+```{r}
+vif(model.12)
+```
+```{r}
+
+par(mfrow=c(1,2))
+
+plot(x=fitted(model.12), y=rstandard(model.12),
+     panel.last = abline(h=0, lty=2))
+
+qqnorm(rstandard(model.12), main="", datax=TRUE)
+qqline(rstandard(model.12), datax=TRUE)
+
+```
+```{r}
+ad.test(rstandard(model.12)) # A = 0.2629, p-value = 0.6829
+
+detach(iqsize)
+```
+Blood pressure (variable selection using best subsets regression)
+
+    Load the bloodpress data.
+    Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression).
+    Fit model with Age and Weight and note the variance inflation factors are acceptable, adjusted R2 can't get much better, and a residual analysis and normality test yields no concerns.
+```{r message=FALSE}
+bloodpress <- read.table("DataL10/bloodpress.txt", header=T)
+attach(bloodpress)
+
+subset <- regsubsets(BP ~ Age + Weight + BSA + Dur + Pulse + Stress,
+                     method="exhaustive", nbest=2, data=bloodpress)
+cbind(summary(subset)$outmat, round(summary(subset)$adjr2, 3),
+      round(summary(subset)$cp, 1))
+```
+```{r}
+model.12 <- lm(BP ~ Age + Weight)
+summary(model.12)
+```
+```{r}
+vif(model.12)
+```
+```{r}
+par(mfrow=c(1,2))
+plot(x=fitted(model.12), y=rstandard(model.12),
+     panel.last = abline(h=0, lty=2))
+
+qqnorm(rstandard(model.12), main="", datax=TRUE)
+qqline(rstandard(model.12), datax=TRUE)
+```
+```{r}
+ad.test(rstandard(model.12)) # A = 0.275, p-value = 0.6225
+
+detach(bloodpress)
+```
+Peruvian blood pressure (variable selection using best subsets regression)
+
+    Load the peru data.
+    Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression).
+    Fit the best 5-predictor and 4-predictor models.
+    Calculate AIC and BIC by hand.
+    Use the stepAIC function in the MASS package to conduct variable selection using a stepwise algorithm based on AIC or BIC.
+```{r message=FALSE}
+peru <- read.table("DataL10/peru.txt", header=T)
+attach(peru)
+
+fraclife <- Years/Age
+
+n <- length(Systol) # 39
+
+subset <- regsubsets(Systol ~ Age + Years + fraclife + Weight + Height + Chin +
+                       Forearm + Pulse,
+                     method="exhaustive", nbest=2, data=peru)
+cbind(summary(subset)$outmat, round(summary(subset)$rsq, 3),
+      round(summary(subset)$adjr2, 3), round(summary(subset)$cp, 1),
+      round(sqrt(summary(subset)$rss/(n-c(rep(1:7,rep(2,7)),8)-1)), 4))
+#          Age Years fraclife Weight Height Chin Forearm Pulse         
+```
+```{r}
+model.5 <- lm(Systol ~ Age + Years + fraclife + Weight + Chin)
+summary(model.5)
+```
+```{r}
+k <- 5
+n*log(sum(residuals(model.5)^2))-n*log(n)+2*(k+1) # AIC = 172.0151
+n*log(sum(residuals(model.5)^2))-n*log(n)+log(n)*(k+1) # BIC = 181.9965
+
+```
+```{r}
+model.4 <- lm(Systol ~ Age + Years + fraclife + Weight)
+summary(model.4)
+```
+```{r}
+k <- 4
+n*log(sum(residuals(model.4)^2))-n*log(n)+2*(k+1) # AIC = 174.2316
+n*log(sum(residuals(model.4)^2))-n*log(n)+log(n)*(k+1) # BIC = 182.5494
+
+```
+```{r}
+library(MASS)
+subset.aic <- stepAIC(lm(Systol ~ Age + Years + fraclife + Weight + Height +
+                           Chin + Forearm + Pulse), direction="both", k=2)
+```
+```{r}
+subset.bic <- stepAIC(lm(Systol ~ Age + Years + fraclife + Weight + Height +
+                           Chin + Forearm + Pulse), direction="both", k=log(n))
+detach(peru)
+```
+Measurements of college students (variable selection using stepwise regression)
+
+    Load the Physical data.
+    Use the add1 and drop1 functions to conduct stepwise regression.
+    Use the regsubsets function to conduct variable selection using backward elimination.
+    Use the regsubsets function to conduct variable selection using forward selection.
+```{r message=FALSE}
+physical <- read.table("DataL10/Physical.txt", header=T)
+attach(physical)
+
+gender <- ifelse(Sex=="Female",1,0)
+
+model.0 <- lm(Height ~ 1)
+add1(model.0, ~ LeftArm + LeftFoot + LeftHand + HeadCirc + nose + gender, test="F")
+```
+```{r}
+model.2 <- lm(Height ~ LeftFoot)
+add1(model.2, ~ . + LeftArm + LeftHand + HeadCirc + nose + gender, test="F")
+```
+```{r}
+model.12 <- lm(Height ~ LeftArm + LeftFoot)
+drop1(model.12, ~ ., test="F")
+```
+```{r}
+add1(model.12, ~ . + LeftHand + HeadCirc + nose + gender, test="F")
+```
+```{r}
+subset <- regsubsets(Height ~ LeftArm + LeftFoot + LeftHand + HeadCirc + nose + gender,
+                     method="backward", data=physical)
+
+```
+```{r}
+subset <- regsubsets(Height ~ LeftArm + LeftFoot + LeftHand + HeadCirc + nose + gender,
+                     method="forward", data=physical)
+
+detach(physical)
+```
+
