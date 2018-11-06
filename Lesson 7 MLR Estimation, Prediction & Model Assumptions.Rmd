@@ -1,14 +1,16 @@
 ---
 title: "Lesson 7: MLR Estimation, Prediction & Model Assumptions"
 output: html_notebook
+editor_options: 
+  chunk_output_type: console
 ---
-IQ and physical characteristics (confidence and prediction intervals)
+# IQ and physical characteristics (confidence and prediction intervals)
 
-    Load the iqsize data.
-    Fit a multiple linear regression model of PIQ on Brain and Height.
-    Calculate a 95% confidence interval for mean PIQ at Brain=90, Height=70.
-    Calculate a 95% confidence interval for mean PIQ at Brain=79, Height=62.
-    Calculate a 95% prediction interval for individual PIQ at Brain=90, Height=70.
+* Load the iqsize data.
+* it a multiple linear regression model of PIQ on Brain and Height.
+* Calculate a 95% confidence interval for mean PIQ at Brain=90, Height=70.
+* Calculate a 95% confidence interval for mean PIQ at Brain=79, Height=62.
+* Calculate a 95% prediction interval for individual PIQ at Brain=90, Height=70.
 ```{r}
 iqsize <- read.table("DataL7/iqsize.txt", header=T)
 attach(iqsize)
@@ -25,17 +27,17 @@ predict(model, interval="prediction",
 
 detach(iqsize)
 ```
-IQ and physical characteristics (residual plots and normality tests)
+# IQ and physical characteristics (residual plots and normality tests)
 
-    Load the iqsize data.
-    Fit a multiple linear regression model of PIQ on Brain and Height.
-    Display residual plot with fitted (predicted) values on the horizontal axis.
-    Display residual plot with Brain on the horizontal axis.
-    Display residual plot with Height on the horizontal axis.
-    Display histogram of the residuals.
-    Display normal probability plot of the residuals and add a diagonal line to the plot. The argument "datax" determines which way round to plot the axes (false by default, which plots the data on the vertical axis, or true, which plots the data on the horizontal axis).
-    Display residual plot with Weight on the horizontal axis.
-    Load the nortest package to access normality tests:
+* Load the iqsize data.
+* Fit a multiple linear regression model of PIQ on Brain and Height.
+* Display residual plot with fitted (predicted) values on the horizontal axis.
+* Display residual plot with Brain on the horizontal axis.
+* Display residual plot with Height on the horizontal axis.
+* Display histogram of the residuals.
+* Display normal probability plot of the residuals and add a diagonal line to the plot. The argument "datax" determines which way round to plot the axes (false by default, which plots the data on the vertical axis, or true, which plots the data on the horizontal axis).
+* Display residual plot with Weight on the horizontal axis.
+* Load the nortest package to access normality tests:
         Anderson-Darling
         Shapiro-Wilk (Ryan-Joiner unavailable in R)
         Lilliefors (Kolmogorov-Smirnov)
@@ -76,18 +78,18 @@ lillie.test(residuals(model)) # D = 0.097, p-value = 0.4897
 
 detach(iqsize)
 ```
-Toluca refrigerator parts (tests for constant error variance)/NO DATA FOUND
+# Toluca refrigerator parts (tests for constant error variance)/NO DATA FOUND
 
-    Load the Toluca data.
-    Fit a simple linear regression model of WorkHours on LotSize.
-    Create lotgroup factor variable splitting the sample into two groups.
-    Load the car package to access tests for constant error variance:
-        Modified Levene (Brown-Forsythe)
-        Cook-Weisberg score (Breusch-Pagan)
+* Load the Toluca data.
+* Fit a simple linear regression model of WorkHours on LotSize.
+* Create lotgroup factor variable splitting the sample into two groups.
+* Load the car package to access tests for constant error variance:
+* Modified Levene (Brown-Forsythe)
+* Cook-Weisberg score (Breusch-Pagan)
 ```{r}
-toluca <- read.table("DataL7/toluca.txt", header=T)
+toluca <- read.table("DataL7/toluca.csv", sep=",", header=T)
 attach(toluca)
-
+head(toluca)
 model <- lm(WorkHours ~ LotSize)
 lotgroup <- factor(LotSize<=70)
 
