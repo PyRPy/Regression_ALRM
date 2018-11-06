@@ -1,0 +1,144 @@
+---
+title: "Lesson 3: SLR Estimation & Prediction"
+output: html_notebook
+---
+Student heights and weights
+
+Load the heightweight data.
+Fit a simple linear regression model with y = wt and x = ht.
+Display a scatterplot of the data with the simple linear regression line and a horizontal line at the mean weight.
+Use the model to predict weight for height = 64.
+```{r}
+heightweight <- read.table("DataL3/student_height_weight.txt", header=T)
+attach(heightweight)
+head(heightweight)
+```
+```{r}
+model <- lm(wt ~ ht)
+plot(x=ht, y=wt,
+     panel.last = c(lines(sort(ht), fitted(model)[order(ht)]),
+                    abline(h=mean(wt))))
+mean(wt) # 158.8
+```
+```{r}
+predict(model, newdata=data.frame(ht=64)) # 126.2708
+
+detach(heightweight)
+```
+Skin cancer mortality
+
+    Load the skin cancer data.
+    Fit a simple linear regression model with y = Mort and x = Lat.
+    Display a scatterplot of the data with the simple linear regression line.
+    Use the model to calculate 95% confidence intervals for E(Mort) at Lat = 40 and 28.
+    Calculate mean(Lat).
+    Use the model to calculate 95% prediction intervals for Mort at Lat = 40.
+    Display a scatterplot of the data with the simple linear regression line, confidence interval bounds, and prediction interval bounds.
+```{r}
+skincancer <- read.table("DataL3/skincancer.txt", header=T)
+attach(skincancer)
+model <- lm(Mort ~ Lat)
+head(skincancer)
+```
+```{r}
+plot(x=Lat, y=Mort,
+     xlab="Latitude (at center of state)", ylab="Mortality (deaths per 10 million)",
+     main="Skin Cancer Mortality versus State Latitude",
+     panel.last = lines(sort(Lat), fitted(model)[order(Lat)]))
+```
+```{r}
+predict(model, interval="confidence", se.fit=T,
+        newdata=data.frame(Lat=c(40, 28)))
+```
+```{r}
+mean(Lat) # 39.53265
+```
+```{r}
+predict(model, interval="prediction",
+        newdata=data.frame(Lat=40))
+```
+```{r}
+plot(x=Lat, y=Mort,
+     xlab="Latitude (at center of state)", ylab="Mortality (deaths per 10 million)",
+     ylim=c(60, 260),
+     panel.last = c(lines(sort(Lat), fitted(model)[order(Lat)]),
+                    lines(sort(Lat), 
+                          predict(model, 
+                                  interval="confidence")[order(Lat), 2], col="green"),
+                    lines(sort(Lat), 
+                          predict(model, 
+                                  interval="confidence")[order(Lat), 3], col="green"),
+                    lines(sort(Lat), 
+                          predict(model, 
+                                  interval="prediction")[order(Lat), 2], col="purple"),
+                    lines(sort(Lat), 
+                          predict(model, 
+                                  interval="prediction")[order(Lat), 3], col="purple")))
+
+detach(skincancer)
+```
+Hospital infection risk
+
+    Load the infectionrisk data.
+    Select only hospitals in regions 1 or 2.
+    Display a scatterplot of Stay versus InfctRsk.
+    Select only hospitals with Stay < 16 (i.e., remove the two hospitals with extreme values of Stay).
+    Fit a simple linear regression model with y = InfctRsk and x = Stay.
+    Use the model to calculate 95% confidence intervals for E(InfctRsk) at Stay = 10.
+    Use the model to calculate 95% prediction intervals for InfctRsk at Stay = 10.
+    Display a scatterplot of the data with the simple linear regression line, confidence interval bounds, and prediction interval bounds.
+
+```{r}
+infectionrisk <- read.table("DataL3/infectionrisk.txt", header=T)
+infectionrisk <- infectionrisk[infectionrisk$Region==1 | infectionrisk$Region==2, ]
+attach(infectionrisk)
+plot(x=Stay, y=InfctRsk)
+detach(infectionrisk)
+```
+```{r}
+infectionrisk <- infectionrisk[infectionrisk$Stay<16, ]
+attach(infectionrisk)
+plot(x=Stay, y=InfctRsk)
+```
+```{r}
+model <- lm(InfctRsk ~ Stay)
+
+predict(model, interval="confidence",
+        newdata=data.frame(Stay=10))
+```
+```{r}
+predict(model, interval="prediction",
+        newdata=data.frame(Stay=10))
+```
+```{r}
+plot(x=Stay, y=InfctRsk,
+     ylim=c(0, 9),
+     panel.last = c(lines(sort(Stay), fitted(model)[order(Stay)]),
+                    lines(sort(Stay), 
+                          predict(model, 
+                                  interval="confidence")[order(Stay), 2], col="green"),
+                    lines(sort(Stay), 
+                          predict(model, 
+                                  interval="confidence")[order(Stay), 3], col="green"),
+                    lines(sort(Stay), 
+                          predict(model, 
+                                  interval="prediction")[order(Stay), 2], col="purple"),
+                    lines(sort(Stay), 
+                          predict(model, 
+                                  interval="prediction")[order(Stay), 3], col="purple")))
+
+detach(infectionrisk)
+```
+We can make the following observations:
+
+For the interval given under 95% CI, we say with 95% confidence we can estimate that in hospitals in which the average length of stay is 10 days, the mean infection risk is between 4.25921 and 4.79849.
+For the interval given under 95% PI, we say with 95% confidence that for any future hospital where the average length of stay is 10 days, the infection risk is between 2.45891 and 6.59878.
+The value under Fit is calculated as ^y=???1.160+0.5689(10)=4.529
+.
+The value under SE Fit is the standard error of ^y
+and it measures the accuracy of ^y
+as an estimate of E(Y ).
+Since df = n ??? 2 = 58 ??? 2 = 56, the multiplier for 95% confidence is 2.00324. The 95% CI for E(Y) is calculated as 4.52885±(2.00324×0.134602)=4.52885±0.26964=(4.259,4.798)
+.
+Since S = ???MSE
+= 1.02449, the 95% PI is calculated as 4.52885±(2.00324×???1.024492+0.1346022)=4.52885±0.20699=(2.459,6.599). 
