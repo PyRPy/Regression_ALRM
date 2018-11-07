@@ -287,20 +287,20 @@ ad.test(rstandard(model.12)) # A = 0.2629, p-value = 0.6829
 
 detach(iqsize)
 ```
-Blood pressure (variable selection using best subsets regression)
-
-    Load the bloodpress data.
-    Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression).
-    Fit model with Age and Weight and note the variance inflation factors are acceptable, adjusted R2 can't get much better, and a residual analysis and normality test yields no concerns.
-```{r message=FALSE}
+# Blood pressure (variable selection using best subsets regression)
+Load the bloodpress data.
+```{r}
 bloodpress <- read.table("DataL10/bloodpress.txt", header=T)
 attach(bloodpress)
-
+```
+Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression).
+```{r message=FALSE}
 subset <- regsubsets(BP ~ Age + Weight + BSA + Dur + Pulse + Stress,
                      method="exhaustive", nbest=2, data=bloodpress)
 cbind(summary(subset)$outmat, round(summary(subset)$adjr2, 3),
       round(summary(subset)$cp, 1))
 ```
+Fit model with Age and Weight and note the variance inflation factors are acceptable, adjusted R2 can't get much better, and a residual analysis and normality test yields no concerns.
 ```{r}
 model.12 <- lm(BP ~ Age + Weight)
 summary(model.12)
@@ -321,17 +321,23 @@ ad.test(rstandard(model.12)) # A = 0.275, p-value = 0.6225
 
 detach(bloodpress)
 ```
-Peruvian blood pressure (variable selection using best subsets regression)
-
-    Load the peru data.
-    Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression).
-    Fit the best 5-predictor and 4-predictor models.
-    Calculate AIC and BIC by hand.
-    Use the stepAIC function in the MASS package to conduct variable selection using a stepwise algorithm based on AIC or BIC.
-```{r message=FALSE}
+# Peruvian blood pressure (variable selection using best subsets regression)
+* Y = systolic blood pressure
+* X1 = age
+* X2 = years in urban area
+* X3 = X2 /X1 = fraction of life in urban area
+* X4 = weight (kg)
+* X5 = height (mm)
+* X6 = chin skinfold
+* X7 = forearm skinfold
+* X8 = resting pulse rate
+Load the peru data.
+```{r}
 peru <- read.table("DataL10/peru.txt", header=T)
 attach(peru)
-
+```
+Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression).
+```{r message=FALSE}
 fraclife <- Years/Age
 
 n <- length(Systol) # 39
@@ -344,6 +350,8 @@ cbind(summary(subset)$outmat, round(summary(subset)$rsq, 3),
       round(sqrt(summary(subset)$rss/(n-c(rep(1:7,rep(2,7)),8)-1)), 4))
 #          Age Years fraclife Weight Height Chin Forearm Pulse         
 ```
+Fit the best 5-predictor and 4-predictor models.
+Calculate AIC and BIC by hand.
 ```{r}
 model.5 <- lm(Systol ~ Age + Years + fraclife + Weight + Chin)
 summary(model.5)
@@ -364,6 +372,7 @@ n*log(sum(residuals(model.4)^2))-n*log(n)+2*(k+1) # AIC = 174.2316
 n*log(sum(residuals(model.4)^2))-n*log(n)+log(n)*(k+1) # BIC = 182.5494
 
 ```
+Use the stepAIC function in the MASS package to conduct variable selection using a stepwise algorithm based on AIC or BIC.
 ```{r}
 library(MASS)
 subset.aic <- stepAIC(lm(Systol ~ Age + Years + fraclife + Weight + Height +
@@ -374,23 +383,29 @@ subset.bic <- stepAIC(lm(Systol ~ Age + Years + fraclife + Weight + Height +
                            Chin + Forearm + Pulse), direction="both", k=log(n))
 detach(peru)
 ```
-Measurements of college students (variable selection using stepwise regression)
+# Measurements of college students (variable selection using stepwise regression)
+* Y = height (in)
+* X1 = left forearm length (cm)
+* X2 = left foot length (cm)
+* X3 = left palm width
+* X4 = head circumference (cm)
+* X5 = nose length (cm)
+* X6 = gender, coded as 0 for male and 1 for female
 
-    Load the Physical data.
-    Use the add1 and drop1 functions to conduct stepwise regression.
-    Use the regsubsets function to conduct variable selection using backward elimination.
-    Use the regsubsets function to conduct variable selection using forward selection.
-```{r message=FALSE}
+Load the Physical data.
+```{r}
 physical <- read.table("DataL10/Physical.txt", header=T)
 attach(physical)
-
+```
+Use the add1 and drop1 functions to conduct stepwise regression.
+```{r message=FALSE}
 gender <- ifelse(Sex=="Female",1,0)
 
 model.0 <- lm(Height ~ 1)
-add1(model.0, ~ LeftArm + LeftFoot + LeftHand + HeadCirc + nose + gender, test="F")
+add1(model.0, ~ LeftArm + LeftFoot + LeftHand + HeadCirc + nose + gender, test="F") # full model
 ```
 ```{r}
-model.2 <- lm(Height ~ LeftFoot)
+model.2 <- lm(Height ~ LeftFoot) # LeftFoot highest F-value/Lowest AIC
 add1(model.2, ~ . + LeftArm + LeftHand + HeadCirc + nose + gender, test="F")
 ```
 ```{r}
@@ -398,17 +413,18 @@ model.12 <- lm(Height ~ LeftArm + LeftFoot)
 drop1(model.12, ~ ., test="F")
 ```
 ```{r}
-add1(model.12, ~ . + LeftHand + HeadCirc + nose + gender, test="F")
+add1(model.12, ~ . + LeftHand + HeadCirc + nose + gender, test="F") # not significant anymore !
 ```
+Use the regsubsets function to conduct variable selection using backward elimination.
 ```{r}
 subset <- regsubsets(Height ~ LeftArm + LeftFoot + LeftHand + HeadCirc + nose + gender,
                      method="backward", data=physical)
-
+summary(subset)
 ```
+Use the regsubsets function to conduct variable selection using forward selection.
 ```{r}
 subset <- regsubsets(Height ~ LeftArm + LeftFoot + LeftHand + HeadCirc + nose + gender,
                      method="forward", data=physical)
-
+summary(subset)
 detach(physical)
 ```
-
