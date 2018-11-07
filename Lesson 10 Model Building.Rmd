@@ -246,23 +246,28 @@ ad.test(rstandard(model.12)) # A = 0.6136, p-value = 0.08628
 
 detach(cement)
 ```
-IQ and body size (variable selection using best subsets regression)
+# IQ and body size (variable selection using best subsets regression)
 
-    Load the iqsize data.
-    Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression).
-    Fit model with Brain and Height and note the variance inflation factors are acceptable, adjusted R2 is as good as it gets with this dataset, and a residual analysis and normality test yields no concerns.
+Load the iqsize data.
 ```{r}
 iqsize <- read.table("DataL10/iqsize.txt", header=T)
 attach(iqsize)
-
+```
+Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression).
+```{r}
+library(leaps)
 subset <- regsubsets(PIQ ~ Brain + Height + Weight, method="exhaustive", nbest=2, data=iqsize)
 cbind(summary(subset)$outmat, round(summary(subset)$adjr2, 3), round(summary(subset)$cp, 1))
 ```
+from the results above, both adj-R2 and Cp are pointing to 'Brain' and 'Height' as good candidate for predictors.
+
+Fit model with Brain and Height and note the variance inflation factors are acceptable, adjusted R2 is as good as it gets with this dataset, and a residual analysis and normality test yields no concerns.
 ```{r}
 model.12 <- lm(PIQ ~ Brain + Height)
 summary(model.12)
 ```
 ```{r}
+library(car)
 vif(model.12)
 ```
 ```{r}
@@ -277,6 +282,7 @@ qqline(rstandard(model.12), datax=TRUE)
 
 ```
 ```{r}
+library(nortest)
 ad.test(rstandard(model.12)) # A = 0.2629, p-value = 0.6829
 
 detach(iqsize)
