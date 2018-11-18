@@ -4,17 +4,12 @@ output: html_notebook
 ---
 https://onlinecourses.science.psu.edu/stat501/node/418/
 # Google stock (autoregression model)
-
-    Use the read.zoo function in the zoo package to load the google_stock data in time series format.
-    Create a time series plot of the data.
-    Load the google_stock data in the usual way using read-table.
-    Use the ts function to convert the price variable to a time series.
-    Create a plot of partial autocorrelations of price.
-    Calculate a lag-1 price variable (note that the lag argument for the function is -1, not +1).
-    Create a scatterplot of price vs lag1price.
-    Use the ts.intersect function to create a dataframe containing price and lag1price.
-    Fit a simple linear regression model of price vs lag1price (a first-order autoregression model).
-
+    
+* Use the read.zoo function in the zoo package to load the google_stock data in time series format.
+* Create a time series plot of the data.
+* Load the google_stock data in the usual way using read-table.
+* Use the ts function to convert the price variable to a time series.
+* Create a plot of partial autocorrelations of price.
 ```{r}
 library(zoo)
 google <- read.csv("DataL14/google_stock.csv", header=T)
@@ -25,34 +20,38 @@ plot(google.ts)
 ```{r}
 pacf(google.ts)
 ```
+Calculate a lag-1 price variable (note that the lag argument for the function is -1, not +1).
+Create a scatterplot of price vs lag1price.
 ```{r}
 lag1price <- lag(google.ts, -1)
 plot(google.ts ~ lag1price, xy.labels=F)
 ```
+* Use the ts.intersect function to create a dataframe containing price and lag1price.
+* Fit a simple linear regression model of price vs lag1price (a first-order autoregression model).
 ```{r}
 lagdata <- ts.intersect(google.ts, lag1price, dframe=T)
 summary(lm(google.ts ~ lag1price, data=lagdata))
 ```
 # Earthquakes (autoregression model)
 
-    Load the earthquakes data.
-    Create a time series plot of the data.
-    Use the ts function to convert the Quakes variable to a time series.
-    Create a plot of partial autocorrelations of Quakes.
-    Calculate lag-1, lag-2, and lag-3 Quakes variables.
-    Use the ts.intersect function to create a dataframe containing Quakes and the three lag variables.
-    Fit a multiple linear regression model of Quakes versus the three lag variables (a third-order autoregression model).
+Fit a multiple linear regression model of Quakes versus the three lag variables (a third-order autoregression model).
 
+Load the earthquakes data.
+Create a time series plot of the data.
 ```{r}
 earthquakes <- read.table("DataL14/earthquakes.txt", header=T)
 attach(earthquakes)
 
 plot(Year, Quakes, type="b")
 ```
+Use the ts function to convert the Quakes variable to a time series.
+Create a plot of partial autocorrelations of Quakes.
 ```{r}
 Quakes.ts <- ts(Quakes)
 pacf(Quakes.ts)
 ```
+Calculate lag-1, lag-2, and lag-3 Quakes variables.
+Use the ts.intersect function to create a dataframe containing Quakes and the three lag variables.
 ```{r}
 lag1Quakes <- lag(Quakes.ts, -1)
 lag2Quakes <- lag(Quakes.ts, -2)
@@ -63,15 +62,9 @@ summary(lm(Quakes.ts ~ lag1Quakes + lag2Quakes + lag3Quakes, data=lagdata))
 detach(earthquakes)
 ```
 # Blaisdell company (regression with autoregressive errors)
-
-    Load the blaisdell data.
-    Fit a simple linear regression model of comsales vs indsales.
-    Use the dwt function in the car package to conduct the Durbin-Watson test on the residuals.
-    Conduct the Ljung-Box test on the residuals.
-    Perform the Cochrane-Orcutt procedure to transform the variables.
-    Forecast comsales for period 21 when indsales are projected to be $175.3 million.
-    Perform the Hildreth-Lu procedure to transform the variables.
-    Perform the first differences procedure to transform the variables.
+    
+Load the blaisdell data.
+Fit a simple linear regression model of comsales vs indsales.
 ```{r}
 blaisdell <- read.table("DataL14/Blaisdell_Company.csv", sep=",",  header=T)
 attach(blaisdell)
@@ -80,6 +73,8 @@ head(blaisdell)
 model.1 <- lm(comsales ~ indsales)
 summary(model.1)
 ```
+Use the dwt function in the car package to conduct the Durbin-Watson test on the residuals.
+Conduct the Ljung-Box test on the residuals.
 ```{r}
 # Durbin-Watson Test
 library(car)
@@ -89,12 +84,15 @@ dwt(model.1)
 # Ljung-Box Q Test
 Box.test(residuals(model.1), lag = 1, type = "Ljung")
 ```
+Perform the Cochrane-Orcutt procedure to transform the variables.
+Perform the first differences procedure to transform the variables.
 ```{r}
 # Cochrane-Orcutt Procedure
 res.ts <- ts(residuals(model.1))
 lag1res <- lag(res.ts, -1)
 lagdata1 <- ts.intersect(res.ts, lag1res)
 acp <- coef(lm(res.ts ~ lag1res -1, data=lagdata1)) # 0.6311636
+
 y.ts <- ts(comsales)
 x.ts <- ts(indsales)
 lag1y <- lag(y.ts, -1)
@@ -104,6 +102,7 @@ x.co <- x.ts-acp*lag1x
 model.2 <- lm(y.co ~ x.co)
 summary(model.2)
 ```
+
 ```{r}
 dwt(model.2)
 ```
@@ -113,6 +112,7 @@ sqrt(vcov(model.2)[1,1])/(1-acp) # se = 0.4533986
 b1 <- coef(model.2)[2] # 0.1737583
 
 ```
+Forecast comsales for period 21 when indsales are projected to be $175.3 million.
 ```{r}
 fit.20 <- b0+b1*indsales[20] # 28.76577
 fit.20
@@ -121,6 +121,7 @@ fit.21 <- b0+b1*175.3 # 29.3913
 forecast.21 <- fit.21+acp*res.20 # 29.40028
 fit.21
 ```
+Perform the Hildreth-Lu procedure to transform the variables.
 ```{r}
 # Hildreth-Lu Procedure
 sse <- vector()
@@ -135,4 +136,3 @@ x.hl = x.ts-acp*lag1x
 model.3 <- lm(y.hl ~ x.hl)
 summary(model.3)
 ```
-
