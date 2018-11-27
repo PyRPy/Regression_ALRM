@@ -2,18 +2,21 @@
 title: "Lesson 1: Simple Linear Regression"
 output: html_notebook
 ---
-Temperature
+# Temperature
 https://newonlinecourses.science.psu.edu/stat501/node/419/
 Create the temperature data and produce a scatterplot with points and lines:
 
-```{r}
+```{r message=FALSE}
+library(tidyverse)
 C <- seq(0, 50, by=5)
 F <- (9/5)*C+32
-plot(C, F, type="b", xlab="Celsius", ylab="Fahrenheit", ylim=c(30,130))
+# plot(C, F, type="b", xlab="Celsius", ylab="Fahrenheit", ylim=c(30,130))
+qplot(C, F, xlab="Celsius", ylab="Fahrenheit", ylim=c(30,130))+
+  geom_smooth(method = 'lm')
 ```
-Skin cancer
+# Skin cancer
 
-Load the skin cancer data and produce a scatterplot with a simple linear regression line:
+* Load the skin cancer data and produce a scatterplot with a simple linear regression line:
 ```{r}
 skincancer <- read.table("Data1/skincancer.txt", header=T)
 attach(skincancer)
@@ -22,41 +25,51 @@ model <- lm(Mort ~ Lat)
 
 ```
 ```{r}
-plot(x=Lat, y=Mort,
-     xlab="Latitude (at center of state)", ylab="Mortality (deaths per 10 million)",
-     main="Skin Cancer Mortality versus State Latitude",
-     panel.last = lines(sort(Lat), fitted(model)[order(Lat)]))
+# plot(x=Lat, y=Mort,
+#      xlab="Latitude (at center of state)", ylab="Mortality (deaths per 10 million)",
+#      main="Skin Cancer Mortality versus State Latitude",
+#      panel.last = lines(sort(Lat), fitted(model)[order(Lat)]))
+qplot(x=Lat, y=Mort,
+      xlab="Latitude (at center of state)", ylab="Mortality (deaths per 10 million)",
+      main="Skin Cancer Mortality versus State Latitude")+ 
+      geom_line(aes(x=Lat, y= model$fitted.values), col='blue')
+
 detach(skincancer)
 ```
-
-Student height and weight
-
-    Load the student height and weight data.
-    Fit a simple linear regression model.
-    Produce a scatterplot with a simple linear regression line and another line with specified  intercept and slope.
-    Calculate sum of squared errors (SSE).
-    Predict weight for height=66 and height=67.
-
+# Student height and weight
+* Load the student height and weight data.
+* Fit a simple linear regression model.
 ```{r}
 heightweight <- read.table("Data1/student_height_weight.txt", header=T)
 attach(heightweight)
 
 model <- lm(wt ~ ht)
 summary(model)
-# Hashtag denotes comments
-# Coefficients:
-#              Estimate Std. Error t value Pr(>|t|)    
-# (Intercept) -266.5344    51.0320  -5.223    8e-04 ***
-# ht             6.1376     0.7353   8.347 3.21e-05 ***
+```
+* Produce a scatterplot with a simple linear regression line and another line with specified  intercept and slope.
+```{r}
+# plot(x=ht, y=wt, ylim=c(110,210), xlab="height", ylab="weight", 
+#      panel.last = c(lines(sort(ht), fitted(model[order(ht)]),)))
+# lines(ht, -331.2+7.1*ht, lty=2)
+ggplot(data=heightweight, aes(x=ht, y=wt)) +
+  geom_point()+
+  ylim(110,210)+ 
+  xlab("height")+ 
+  ylab("weight") +
+  geom_line(aes(x=ht, y= model$fitted.values), col='blue')+
+  geom_abline(slope=7.1, intercept = -331.2, col='red')
 
-plot(x=ht, y=wt, ylim=c(110,210), xlab="height", ylab="weight", 
-     panel.last = c(lines(sort(ht), fitted(model[order(ht)]),)))
-lines(ht, -331.2+7.1*ht, lty=2)
-sum(residuals(model)^2) # SSE = 597.386
+#      panel.last = c(lines(sort(ht), fitted(model[order(ht)]),)))
+# lines(ht, -331.2+7.1*ht, lty=2)
 
 ```
+* Calculate sum of squared errors (SSE).
 ```{r}
-predict(model, newdata=data.frame(ht=c(66, 67))) # 138.5460 144.6836
+sum(residuals(model)^2)
+```
+* Predict weight for height=66 and height=67.
+```{r}
+predict(model, newdata=data.frame(ht=c(66, 67)))
 detach(heightweight)
 ```
 High school GPA and college test scores
