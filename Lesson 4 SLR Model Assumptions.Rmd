@@ -5,15 +5,11 @@ output: html_notebook
 https://newonlinecourses.science.psu.edu/stat501/node/276/
 In short, you'll need to learn how to worry just the right amount. Worry when you should, and don't overworry when you shouldn't! And when you are worried, there are  remedies available, which we'll learn more about later in the course. For example, one thing to try is transforming either the response variable, predictor variable, or both - there is an example of this in Section 4.8 and we'll see more examples in Lesson 9.
 
-Alcohol consumption and muscle strength
+# Alcohol consumption and muscle strength
 
-    Load the alcoholarm data.
-    Fit a simple linear regression model with y = strength and x = alcohol.
-    Display model results.
-    Display a scatterplot of the data with the simple linear regression line.
-    Display a residual plot with fitted values on the horizontal axis.
-    Display a residual plot with x = alcohol on the horizontal axis.
-
+Load the alcoholarm data.
+Fit a simple linear regression model with y = strength and x = alcohol.
+Display model results.
 ```{r}
 alcoholarm <- read.table("DataL4/alcoholarm.txt", header=T)
 attach(alcoholarm)
@@ -21,6 +17,9 @@ attach(alcoholarm)
 model <- lm(strength ~ alcohol)
 summary(model)
 ```
+Display a scatterplot of the data with the simple linear regression line.
+Display a residual plot with fitted values on the horizontal axis.
+Display a residual plot with x = alcohol on the horizontal axis.
 ```{r}
 par(mfrow=c(2,2))
 plot(x=alcohol, y=strength,
@@ -37,16 +36,12 @@ plot(x=alcohol, y=residuals(model),
 
 detach(alcoholarm)
 ```
-Blood pressure
+# Blood pressure
 
-    Load the bloodpress data.
-    Fit a simple linear regression model with y = BP and x = Age, display model results, and display a scatterplot of the data with the simple linear regression line.
-    Fit a simple linear regression model with y = BP and x = Weight, display model results, and display a scatterplot of the data with the simple linear regression line.
-    Fit a simple linear regression model with y = BP and x = Duration, display model results, and display a scatterplot of the data with the simple linear regression line.
-    Display a residual plot for the model using x = Age with Weight on the horizontal axis.
-    Fit a multiple linear regression model with y = BP, x1 = Age, and x2 = Weight.
-    Display a residual plot for the model using x1 = Age and x2 = Weight with Duration on the horizontal axis.
-
+Load the bloodpress data.
+Fit a simple linear regression model with y = BP and x = Age, display model results, and display a scatterplot of the data with the simple linear regression line.
+Fit a simple linear regression model with y = BP and x = Weight, display model results, and display a scatterplot of the data with the simple linear regression line.
+Fit a simple linear regression model with y = BP and x = Duration, display model results, and display a scatterplot of the data with the simple linear regression line.
 ```{r}
 bloodpress <- read.table("DataL4/bloodpress.txt", header=T)
 attach(bloodpress)
@@ -62,9 +57,13 @@ summary(model.2)
 model.3 <- lm(BP ~ Dur)
 summary(model.3)
 ```
+Display a residual plot for the model using x = Age with Weight on the horizontal axis.
+Fit a multiple linear regression model with y = BP, x1 = Age, and x2 = Weight.
+Display a residual plot for the model using x1 = Age and x2 = Weight with Duration on the horizontal axis.
 ```{r}
 model.12 <- lm(BP ~ Age + Weight)
 ```
+
 ```{r}
 par(mfrow=c(2,2))
 plot(x=Age, y=BP,
@@ -83,7 +82,7 @@ plot(x=Weight, y=residuals(model.1),
      xlab="Weight (pounds)", ylab="Residuals from model with Age",
      panel.last = abline(h=0, lty=2))
 ```
-This "residuals versus weight" plot can be used to determine whether we should add the predictor weight to the model that already contains the predictor age. In general, if there is some non-random pattern to the plot, it indicates that it would be worthwhile adding the predictor to the model.
+* This "residuals versus weight" plot can be used to determine whether we should add the predictor weight to the model that already contains the predictor age. In general, if there is some non-random pattern to the plot, it indicates that it would be worthwhile adding the predictor to the model.
 ```{r}
 plot(x=Dur, y=residuals(model.12),
      xlab="Duration of hypertension (years)",
@@ -92,19 +91,14 @@ plot(x=Dur, y=residuals(model.12),
 
 detach(bloodpress)
 ```
+* The residuals "bounce randomly" around the 0 line. This suggests that the assumption that the relationship is linear is reasonable.
+* The residuals roughly form a "horizontal band" around the 0 line. This suggests that the variances of the error terms are equal.
+* No one residual "stands out" from the basic random pattern of residuals. This suggests that there are no outliers.
 
-    The residuals "bounce randomly" around the 0 line. This suggests that the assumption that the relationship is linear is reasonable.
-    The residuals roughly form a "horizontal band" around the 0 line. This suggests that the variances of the error terms are equal.
-    No one residual "stands out" from the basic random pattern of residuals. This suggests that there are no outliers.
-
-Tread wear
-
-    Load the treadwear data.
-    Fit a simple linear regression model with y = groove and x = mileage.
-    Display model results.
-    Display a scatterplot of the data with the simple linear regression line.
-    Display a residual plot with fitted values on the horizontal axis.
-
+# Tread wear
+Load the treadwear data.
+Fit a simple linear regression model with y = groove and x = mileage.
+Display model results.
 ```{r}
 treadwear <- read.table("DataL4/treadwear.txt", header=T)
 attach(treadwear)
@@ -112,7 +106,9 @@ attach(treadwear)
 model <- lm(groove ~ mileage)
 summary(model)
 ```
-```{r, fig.height=2, fig.width=7}
+Display a scatterplot of the data with the simple linear regression line.
+Display a residual plot with fitted values on the horizontal axis.
+```{r, fig.height=3, fig.width=7}
 par(mfrow=c(1,2))
 plot(x=mileage, y=groove,
      xlab="Mileage (1000s of miles)", ylab="Depth of groove (mils)",
@@ -130,19 +126,12 @@ how to stpecify the size of the plot.
 How does non-constant error variance show up on a residual vs. fits plot?
 
 The Answer: Non-constant error variance shows up on a residuals vs. fits (or predictor) plot in any of the following ways:
+* The plot has a "fanning" effect. That is, the residuals are close to 0 for small x values and are more spread out for large x values.
+* The plot has a "funneling" effect. That is, the residuals are spread out for small x values and close to 0 for large x values. Or, the spread of the residuals in the residuals vs. fits plot varies in some complex fashion.
 
-    The plot has a "fanning" effect. That is, the residuals are close to 0 for small x values and are more spread out for large x values.
-    The plot has a "funneling" effect. That is, the residuals are spread out for small x values and close to 0 for large x values.
-    Or, the spread of the residuals in the residuals vs. fits plot varies in some complex fashion.
-
-Plutonium
-
-    Load the alphapluto data.
-    Fit a simple linear regression model with y = alpha and x = pluto.
-    Display model results.
-    Display a scatterplot of the data with the simple linear regression line.
-    Display a residual plot with fitted values on the horizontal axis.
-
+# Plutonium
+Load the alphapluto data.
+Fit a simple linear regression model with y = alpha and x = pluto.
 ```{r}
 alphapluto <- read.table("DataL4/alphapluto.txt", header=T)
 attach(alphapluto)
@@ -150,7 +139,10 @@ attach(alphapluto)
 model <- lm(alpha ~ pluto)
 summary(model)
 ```
-```{r, fig.height=2, fig.width=6}
+Display model results.
+Display a scatterplot of the data with the simple linear regression line.
+Display a residual plot with fitted values on the horizontal axis.
+```{r, fig.height=3, fig.width=7}
 par(mfrow=c(1,2))
 plot(x=pluto, y=alpha,
      xlab="Plutonium activity (pCi/g)", ylab="Alpha count rate (number per second)",
@@ -163,18 +155,11 @@ plot(x=fitted(model), y=residuals(model),
 detach(alphapluto)
 ```
 How does an outlier show up on a residuals vs. fits plot?
-Alcohol and tobacco
-
-    Load the alcoholtobacco data.
-    Fit a simple linear regression model with y = Alcohol and x = Tobacco.
-    Display model results.
-    Display a scatterplot of the data with the simple linear regression line.
-    Display a residual plot with fitted values on the horizontal axis.
-    Refit the model excluding Northern Ireland.
-    Display a scatterplot of the data excluding Northern Ireland with the simple linear regression line for the model excluding Northern Ireland.
-    Display a standardized residual plot for the model fit to all the data with fitted values on the horizontal axis.
-    Calculate the standardized residual for Northern Ireland.
-
+# Alcohol and tobacco
+    
+Load the alcoholtobacco data.
+Fit a simple linear regression model with y = Alcohol and x = Tobacco.
+Display model results.
 ```{r}
 alcoholtobacco <- read.csv("DataL4/smokebeer.csv", header=T)
 colnames(alcoholtobacco) <- c("Region", "Alcohol", "Tobacco")
@@ -184,7 +169,9 @@ head(alcoholtobacco)
 model.1 <- lm(Alcohol ~ Tobacco)
 summary(model.1)
 ```
-```{r, fig.height=2, fig.width=6}
+Display a scatterplot of the data with the simple linear regression line.
+Display a residual plot with fitted values on the horizontal axis.
+```{r, fig.height=3, fig.width=7}
 par(mfrow=c(1,2))
 plot(x=Tobacco, y=Alcohol,
      xlab="Ave weekly tobacco expenditure (GBP)", 
@@ -197,7 +184,11 @@ plot(x=fitted(model.1), y=residuals(model.1),
 
 # Note that Northern Ireland's residual stands apart from the basic random pattern of the rest of the residuals. That is, the residual vs. fits plot suggests that an outlier exists.
 ```
-```{r, fig.height=2, fig.width=6}
+Refit the model excluding Northern Ireland.
+Calculate the standardized residual for Northern Ireland.
+Display a scatterplot of the data excluding Northern Ireland with the simple linear regression line for the model excluding Northern Ireland.
+Display a standardized residual plot for the model fit to all the data with fitted values on the horizontal axis.
+```{r, fig.height=2.5, fig.width=6}
 par(mfrow=c(1,2))
 model.2 <- lm(Alcohol ~ Tobacco, subset=Region!="NorthernIreland")
 
@@ -206,18 +197,16 @@ plot(x=Tobacco[Region!="NorthernIreland"], y=Alcohol[Region!="NorthernIreland"],
      ylab="Ave weekly alcohol expenditure (GBP)",
      panel.last = lines(sort(Tobacco), fitted(model.2)[order(Tobacco)]))
 
-plot(x=fitted(model.1), y=rstandard(model.1),
+plot(x=fitted(model.2), y=rstandard(model.2), # correct model number
      xlab="Fitted values", ylab="Standardized residuals",
      panel.last = abline(h=0, lty=2))
 
 ```
-Anscombe data
+# Anscombe data
 
-    Load the anscombe data.
-    Fit a simple linear regression model with y = y3 and x = x3.
-    Display model results.
-    Display a scatterplot of the data with the simple linear regression line.
-    Display a residual plot with fitted values on the horizontal axis.
+Load the anscombe data.
+Fit a simple linear regression model with y = y3 and x = x3.
+Display model results.
 ```{r}
 anscombe <- read.table("DataL4/anscombe.txt", header=T)
 attach(anscombe)
@@ -225,6 +214,8 @@ attach(anscombe)
 model <- lm(y3 ~ x3)
 summary(model)
 ```
+Display a scatterplot of the data with the simple linear regression line.
+Display a residual plot with fitted values on the horizontal axis.
 ```{r,  fig.height=3, fig.width=7}
 par(mfrow=c(1,2))
 plot(x=x3, y=y3,
@@ -239,55 +230,58 @@ detach(anscombe)
 4.5 - Residuals vs. Order Plot
 https://newonlinecourses.science.psu.edu/stat501/node/280/
 
-Handspan and height
+# Handspan and height
 
-    Load the handheight data.
-    Fit a simple linear regression model with y = HandSpan and x = Height.
-    Display a residual plot with fitted values on the horizontal axis.
+Load the handheight data.
+Fit a simple linear regression model with y = HandSpan and x = Height.
 ```{r}
 handheight <- read.table("DataL4/handheight.txt", header=T)
 attach(handheight)
 
 model <- lm(HandSpan ~ Height)
-
+```
+Display a residual plot with fitted values on the horizontal axis.
+```{r}
 plot(x=fitted(model), y=residuals(model),
      xlab="Fitted values", ylab="Residuals",
      panel.last = abline(h=0, lty=2))
 
 detach(handheight)
 ```
-Chemical solution concentration
 
-    Load the solconc data.
-    Fit a simple linear regression model with y = y (concentration) and x = x (time).
-    Display a residual plot with fitted values on the horizontal axis.
+# Chemical solution concentration
+
+Load the solconc data.
+Fit a simple linear regression model with y = y (concentration) and x = x (time).
 ```{r}
 solconc <- read.table("DataL4/solutions_conc.txt", header=F)
 colnames(solconc) <- c("x", "y")
-# head(solconc)
+head(solconc)
 attach(solconc)
 
-model <- lm(y ~ x)
-
+model <- lm(y ~ x, data=solconc)
+```
+Display a residual plot with fitted values on the horizontal axis.
+```{r}
 plot(x=fitted(model), y=residuals(model),
      xlab="Fitted values", ylab="Residuals",
      panel.last = abline(h=0, lty=2))
 
 detach(solconc)
 ```
-Indications that Assumption of Constant Variance is Not Valid
+* Indications that Assumption of Constant Variance is Not Valid
 https://newonlinecourses.science.psu.edu/stat501/node/291/
 
-Old Faithful geyser eruptions
-
-    Load the oldfaithful data.
-    Fit a simple linear regression model with y = waiting and x = eruption.
-    Display a histogram and normal probability plot of the residuals.
+# Old Faithful geyser eruptions
+Load the oldfaithful data.
+Fit a simple linear regression model with y = waiting and x = eruption.
+Display a histogram and normal probability plot of the residuals.
 ```{r,  fig.height=3, fig.width=7}
 oldfaithful <- read.table("DataL4/oldfaithful.txt", header=T)
 # head(oldfaithful)
 colnames(oldfaithful) <- c("eruption", "waiting")
 oldfaithful$waiting <- as.numeric(oldfaithful$waiting)
+
 # str(oldfaithful)
 model <- lm(waiting ~ eruption, data=oldfaithful)
 par(mfrow=c(1,2))
@@ -296,13 +290,13 @@ hist(residuals(model), main="", breaks=12)
 qqnorm(residuals(model), main="")
 qqline(residuals(model))
 ```
-Hospital infection risk
+# Hospital infection risk
 
-    Load the infectionrisk data.
-    Select only hospitals in regions 1 or 2.
-    Fit a simple linear regression model with y = InfctRsk and x = Stay.
-    Display a normal probability plot of the residuals.
-```{r message=FALSE, warning=FALSE}
+Load the infectionrisk data.
+Select only hospitals in regions 1 or 2.
+Fit a simple linear regression model with y = InfctRsk and x = Stay.
+Display a normal probability plot of the residuals.
+```{r message=FALSE, warning=FALSE, fig.height=3, fig.width=4}
 infectionrisk <- read.table("DataL4/infectionrisk.txt", header=T)
 infectionrisk <- infectionrisk[infectionrisk$Region==1 | infectionrisk$Region==2, ]
 attach(infectionrisk)
@@ -314,12 +308,12 @@ qqline(residuals(model))
 
 detach(infectionrisk)
 ```
-Real estate sales
+# Real estate sales
 
-    Load the realestate data.
-    Fit a simple linear regression model with y = SalePrice and x = Sqrfeet.
-    Display a residual plot with fitted values on the horizontal axis.
-```{r}
+Load the realestate data.
+Fit a simple linear regression model with y = SalePrice and x = Sqrfeet.
+Display a residual plot with fitted values on the horizontal axis.
+```{r  fig.height=3, fig.width=4}
 realestate <- read.csv("DataL4/realestate_sales.csv", header=T) # original format not working
 attach(realestate)
 
@@ -331,17 +325,12 @@ plot(x=fitted(model), y=residuals(model),
 
 detach(realestate)
 ```
-Car stopping distances
+# Car stopping distances
 
-    Load the carstopping data.
-    Fit a simple linear regression model with y = StopDist and x = Speed.
-    Display a scatterplot of the data with the simple linear regression line.
-    Display a residual plot with fitted values on the horizontal axis.
-    Create a new response variable equal to ???StopDist.
-    Fit a simple linear regression model with y = ???StopDist and x = Speed.
-    Display a scatterplot of the data with the simple linear regression line.
-    Display a residual plot with fitted values on the horizontal axis.
-    Use the model to predict StopDist for Speed = 10, 20, 30, and 40.
+Load the carstopping data.
+Fit a simple linear regression model with y = StopDist and x = Speed.
+Display a scatterplot of the data with the simple linear regression line.
+Display a residual plot with fitted values on the horizontal axis.
 ```{r, fig.height=3, fig.width=7}
 carstopping <- read.csv("DataL4/carstopping.csv", header=T)
 attach(carstopping)
@@ -354,6 +343,10 @@ plot(x=fitted(model), y=residuals(model),
      xlab="Fitted values", ylab="Residuals",
      panel.last = abline(h=0, lty=2))
 ```
+Create a new response variable equal to sqrt(StopDist.)
+Fit a simple linear regression model with y = ???StopDist and x = Speed.
+Display a scatterplot of the data with the simple linear regression line.
+Display a residual plot with fitted values on the horizontal axis.
 ```{r, fig.height=3, fig.width=7}
 sqrtdist <- sqrt(StopDist) # to put sqrt on "y"
 
@@ -366,11 +359,11 @@ plot(x=fitted(model), y=residuals(model),
      panel.last = abline(h=0, lty=2))
 
 ```
+Use the model to predict StopDist for Speed = 10, 20, 30, and 40.
 ```{r}
 predict(model, interval="prediction",
         newdata=data.frame(Speed=c(10, 20, 30, 40)))^2
 
 detach(carstopping)
 ```
-
 
