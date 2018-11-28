@@ -4,44 +4,44 @@ output: html_notebook
 ---
 Update : 8/26/2018
 
-E2.1 Skin cancer
-Load the skin cancer data.
-Fit a simple linear regression model with y = Mort and x = Lat.
-Display a scatterplot of the data with the simple linear regression line.
-Display model results.
-Calculate confidence intervals for the model parameters (regression coefficients).
+# E2.1 Skin cancer
+
+* Load the skin cancer data.
+* Fit a simple linear regression model with y = Mort and x = Lat.
 ```{r message=FALSE, warning=FALSE}
 skincancer <- read.table("Data2/skincancer.txt", header=T)
 attach(skincancer)
 
 model <- lm(Mort ~ Lat)
-
+```
+* Display a scatterplot of the data with the simple linear regression line.
+```{r}
 plot(x=Lat, y=Mort,
      xlab="Latitude (at center of state)", ylab="Mortality (deaths per 10 million)",
      panel.last = lines(sort(Lat), fitted(model)[order(Lat)]))
 ```
+* Display model results.
 ```{r}
 summary(model)
 ```
-
+* Calculate confidence intervals for the model parameters (regression coefficients).
 ```{r}
 confint(model, level=0.95)
 ```
 ```{r}
 detach(skincancer)
 ```
-E2.2 Cord blood lead concentration [data missing]
+# E2.2 Cord blood lead concentration [data missing]
+
 Load the cord blood lead concentration data.
 Fit a simple linear regression model with y = Cord and x = Sold.
-Display a scatterplot of the data with the simple linear regression line.
-Display model results.
-Calculate confidence intervals for the model parameters (regression coefficients).
-
 ```{r}
 cordblood <- read.table("Data2/leadcord.txt", header=T)
 attach(cordblood)
 head(cordblood)
 ```
+Display a scatterplot of the data with the simple linear regression line.
+Display model results.
 ```{r}
 model <- lm(Cord ~ Sold)
 
@@ -53,11 +53,12 @@ plot(x=Sold, y=Cord,
 ```{r}
 summary(model)
 ```
+Calculate confidence intervals for the model parameters (regression coefficients).
 ```{r}
 confint(model, level=0.95)
 detach(cordblood)
 ```
-E2.3 Skin cancer
+# E2.3 Skin cancer
 Load the skin cancer data.
 Fit a simple linear regression model with y = Mort and x = Lat.
 Display analysis of variance table.
@@ -71,21 +72,18 @@ model <- lm(Mort ~ Lat)
 anova(model)
 detach(skincancer)
 ```
-The degrees of freedom associated with SSR will always be 1 for the simple linear regression model. The degrees of freedom associated with SSTO is n-1 = 49-1 = 48. The degrees of freedom associated with SSE is n-2 = 49-2 = 47. And the degrees of freedom add up: 1 + 47 = 48.
+* The degrees of freedom associated with SSR will always be 1 for the simple linear regression model. The degrees of freedom associated with SSTO is n-1 = 49-1 = 48. The degrees of freedom associated with SSE is n-2 = 49-2 = 47. And the degrees of freedom add up: 1 + 47 = 48.
 The sums of squares add up: SSTO = SSR + SSE. That is, here: 53637 = 36464 + 17173.
 
-E2.4 Height and grade point average
+# E2.4 Height and grade point average
 Load the height and grade point average data.
-Fit a simple linear regression model with y = gpa and x = height.
-Display a scatterplot of the data with the simple linear regression line.
-Display model results.
-Display analysis of variance table.
-
 ```{r}
 heightgpa <- read.table("Data2/heightgpa.txt", header=T)
 head(heightgpa)
 attach(heightgpa)
 ```
+Fit a simple linear regression model with y = gpa and x = height.
+Display a scatterplot of the data with the simple linear regression line.
 ```{r}
 model <- lm(gpa ~ height)
 
@@ -96,20 +94,20 @@ plot(x=height, y=gpa,
 ```{r}
 summary(model)
 ```
+Display model results.
+Display analysis of variance table.
 ```{r}
 anova(model)
 detach(heightgpa)
 ```
-Sprinters
-Load the sprinters data.
-Fit a simple linear regression model with y = Men200m and x = Year.
-Display a scatterplot of the data with the simple linear regression line.
-Display model results.
-Display analysis of variance table.
+# Sprinters
 
 The F-test is only appropriate for testing that the slope differs from 0 (??1 ??? 0).
 Use the t-test to test that the slope is positive (??1 > 0) or negative (??1 < 0). Remember, though, that you will have to divide the P-value that Minitab reports by 2 to get the appropriate P-value.
 
+Load the sprinters data.
+Fit a simple linear regression model with y = Men200m and x = Year.
+Display a scatterplot of the data with the simple linear regression line.
 ```{r}
 sprinters <- read.table("Data2/mens200m.txt", header=T)
 attach(sprinters)
@@ -120,6 +118,8 @@ plot(x=Year, y=Men200m,
      panel.last = lines(sort(Year), fitted(model)[order(Year)]))
 
 ```
+Display model results.
+Display analysis of variance table.
 ```{r}
 summary(model)
 ```
@@ -127,13 +127,10 @@ summary(model)
 anova(model)
 detach(sprinters)
 ```
-Highway sign reading distance and driver age
+# Highway sign reading distance and driver age
 Load the signdist data.
 Fit a simple linear regression model with y = Distance and x = Age.
 Display a scatterplot of the data with the simple linear regression line.
-Display model results.
-Calculate confidence intervals for the slope.
-
 ```{r}
 signdist <- read.table("Data2/signdist.txt", header=T)
 attach(signdist)
@@ -145,9 +142,11 @@ plot(x=Age, y=Distance,
      panel.last = lines(sort(Age), fitted(model)[order(Age)]))
 
 ```
+Display model results.
 ```{r}
 summary(model)
 ```
+Calculate confidence intervals for the slope.
 ```{r}
 confint(model, parm="Age", level=0.95)
 ```
@@ -159,17 +158,15 @@ confint(model, parm="Age", level=0.99)
 ```{r}
 detach(signdist)
 ```
-Handspan and height
+# Handspan and height
 Load the handheight data.
-Fit a simple linear regression model with y = Height and x = Handspan
-Display a scatterplot of the data with the simple linear regression line.
-Display model results.
-Display analysis of variance table.
 ```{r}
 handheight <- read.table("Data2/handheight.txt", header=T)
 attach(handheight)
 head(handheight, n=10)
 ```
+Fit a simple linear regression model with y = Height and x = Handspan
+Display a scatterplot of the data with the simple linear regression line.
 ```{r}
 model <- lm(Height ~ HandSpan)
 
@@ -177,31 +174,35 @@ plot(x=HandSpan, y=Height,
      xlab="HandSpan", ylab="Height",
      panel.last = lines(sort(HandSpan), fitted(model)[order(HandSpan)]))
 ```
+Display model results.
 ```{r}
 summary(model)
 ```
+Display analysis of variance table.
 ```{r}
 anova(model)
 
 detach(handheight)
 ```
-    The residual standard deviation S is 2.744 and this estimates the standard deviation of the errors.
-    r2 = (SSTO-SSE) / SSTO = SSR / (SSR+SSE) = 1500.1 / (1500.1+1242.7) = 1500.1 / 2742.8 = 0.547 or 54.7%. The interpretation is that handspan differences explain 54.7% of the variation in heights.
-    The value of the F statistic is F = 199.2 with 1 and 165 degrees of freedom, and the p-value for this F statistic is 0.000. Thus we reject the null hypothesis H0 : ??1 = 0 because the p-value is so small. In other words, the observed relationship is statistically significant.
+* The residual standard deviation S is 2.744 and this estimates the standard deviation of the errors.
+    r2 = (SSTO-SSE) / SSTO = SSR / (SSR+SSE) = 1500.1 / (1500.1+1242.7) = 1500.1 / 2742.8 = 0.547 or 54.7%. * * The interpretation is that handspan differences explain 54.7% of the variation in heights.
+* The value of the F statistic is F = 199.2 with 1 and 165 degrees of freedom, and the p-value for this F statistic is 0.000. Thus we reject the null hypothesis H0 : ??1 = 0 because the p-value is so small. In other words, the observed relationship is statistically significant.
 
-Checking account deposits
+# Checking account deposits
 
-    Load the newaccounts data.
-    Fit a simple linear regression model with y = New and x = Size
-    Display a scatterplot of the data with the simple linear regression line.
-    Display model results.
-    Display lack of fit analysis of variance table.
+    
+    
+    
+    
     Display usual analysis of variance table.
+Load the newaccounts data.
 ```{r}
 newaccounts <- read.table("Data2/newaccounts.txt", header=T)
 head(newaccounts)
 attach(newaccounts)
 ```
+Fit a simple linear regression model with y = New and x = Size
+Display a scatterplot of the data with the simple linear regression line.
 ```{r}
 model <- lm(New ~ Size)
 
@@ -209,10 +210,12 @@ plot(x=Size, y=New,
      xlab="Size of minimum deposit", ylab="Number of new accounts",
      panel.last = lines(sort(Size), fitted(model)[order(Size)]))
 ```
+Display model results.
 ```{r}
 summary(model)
 ```
-```{r warning=FALSE}
+Display lack of fit analysis of variance table.
+```{r message=FALSE, warning=FALSE}
 library(alr3) # alr3 package must be installed first
 pureErrorAnova(model) # Lack of fit anova table
 ```
