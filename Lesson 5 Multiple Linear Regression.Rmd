@@ -3,54 +3,56 @@ title: "Lesson 5: Multiple Linear Regression"
 output: html_notebook
 ---
 
-IQ and physical characteristics
+# IQ and physical characteristics
 
-    Load the iqsize data.
-    Display a scatterplot matrix of the data.
-    Fit a multiple linear regression model of PIQ on Brain, Height, and Weight.
-    Display model results.
-    Use the anova function to display anova table with sequential (type I) sums of squares.
-    Use the Anova function from the car package to display anova table with adjusted (type III) sums of squares.
-```{r}
+Load the iqsize data.
+Display a scatterplot matrix of the data.
+```{r message=FALSE}
 iqsize <- read.table("DataL5/iqsize.txt", header=T)
 attach(iqsize)
 
-pairs(cbind(PIQ, Brain, Height, Weight))
+pairs(cbind(PIQ, Brain, Height, Weight), lower.panel = NULL)
 ```
+Fit a multiple linear regression model of PIQ on Brain, Height, and Weight.
+Display model results.
 ```{r}
 model <- lm(PIQ ~ Brain + Height + Weight)
 summary(model)
 ```
+Use the anova function to display anova table with sequential (type I) sums of squares.
 ```{r}
 anova(model) # Sequential (type I) SS
 # There is an additional row for each predictor term in the Analysis of Variance Table. By default in Minitab, these represent the reductions in error sum of squares for each term relative to a model that contains all of the remaining terms (so-called Adjusted or Type III sums of squares). It is possible to change this using the Minitab Regression Options to instead use Sequential or Type I sums of squares, which represent the reductions in error sum of squares when a term is added to a model that contains only the terms before it.
 # https://newonlinecourses.science.psu.edu/stat501/node/284/
   
 ```
+Use the Anova function from the car package to display anova table with adjusted (type III) sums of squares.
 ```{r}
 library(car)
 Anova(model, type="III") # Adjusted (type III) SS
 detach(iqsize)
 ```
-Underground air quality
+# Underground air quality
 
     Load the babybirds data.
     Display a scatterplot matrix of the data.
-    Use the scatter3d function from the car package to create a 3D scatterplot of the data.
-    Fit a multiple linear regression model of Vent on O2 and CO2.
-    Display model results.
+    
+    
     Use the Anova function from the car package to display anova table with adjusted (type III) sums of squares.
 ```{r message=FALSE}
 babybirds <- read.table("DataL5/babybirds.txt", header=T)
 attach(babybirds)
 
-pairs(cbind(Vent, O2, CO2))
+pairs(cbind(Vent, O2, CO2), lower.panel = NULL)
 ```
+Use the scatter3d function from the car package to create a 3D scatterplot of the data.
 ```{r}
 library(car)
 scatter3d(Vent ~ O2 + CO2)
 # scatter3d(Vent ~ O2 + CO2, revolutions=3, speed=0.5, grid=F)
 ```
+Fit a multiple linear regression model of Vent on O2 and CO2.
+Display model results.
 ```{r}
 model <- lm(Vent ~ O2 + CO2)
 summary(model)
@@ -59,14 +61,11 @@ summary(model)
 Anova(model, type="III") # Adjusted (type III) SS
 detach(babybirds)
 ```
-Soapsuds example (using matrices)
+# Soapsuds example (using matrices)
 
-    Load the soapsuds data.
-    Fit a simple linear regression model of suds on soap and store the model matrix, X.
-    Display model results.
-    Calculate XTX, XTY, (XTX)-1, and b = (XTX)-1XTY.
-    Fit a multiple linear regression model with linearly dependent predictors.
-
+Load the soapsuds data.
+Fit a simple linear regression model of suds on soap and store the model matrix, X.
+Display model results.
 ```{r}
 soapsuds <- read.table("DataL5/soapsuds.txt", header=T)
 attach(soapsuds)
@@ -74,6 +73,7 @@ attach(soapsuds)
 model <- lm(suds ~ soap, x=T)
 summary(model)
 ```
+Calculate XTX, XTY, (XTX)-1, and b = (XTX)-1XTY.
 ```{r}
 X <- model$x
 t(X) %*% X
@@ -90,20 +90,17 @@ solve(t(X) %*% X) %*% (t(X) %*% suds)
 ```{r}
 head(soapsuds)
 ```
+Fit a multiple linear regression model with linearly dependent predictors.
 ```{r}
 soap2 <- 2*soap
 model <- lm(suds ~ soap + soap2)
 summary(model)
 detach(soapsuds)
 ```
-Pastry sweetness
+# Pastry sweetness
 
-    Load the pastry data.
-    Calculate the correlation between the predictors and create a scatterplot.
-    Fit a multiple linear regression model of Rating on Moisture and Sweetness and display the model results.
-    Create a scatterplot of the data with points marked by Sweetness and two lines representing the fitted regression equation for each sweetness level.
-    Fit a simple linear regression model of Rating on Moisture and display the model results.
-    Fit a simple linear regression model of Rating on Sweetness and display the model results.
+Load the pastry data.
+Calculate the correlation between the predictors and create a scatterplot.
 ```{r}
 pastry <- read.csv("DataL5/pastry.csv", header=T)
 attach(pastry)
@@ -113,10 +110,12 @@ cor(Sweetness, Moisture) # 0
 ```{r}
 plot(Sweetness, Moisture)
 ```
+Fit a multiple linear regression model of Rating on Moisture and Sweetness and display the model results.
 ```{r}
 model.12 <- lm(Rating ~ Moisture + Sweetness)
 summary(model.12)
 ```
+Create a scatterplot of the data with points marked by Sweetness and two lines representing the fitted regression equation for each sweetness level.
 ```{r}
 plot(Moisture, Rating, type="n")
 for (i in 1:16) points(Moisture[i], Rating[i], pch=Sweetness[i], col=Sweetness[i])
@@ -126,41 +125,43 @@ legend("topleft", legend=c("Sweetness = 4",
                            "Sweetness = 2"),
        col=c(4,2), pch=c(4,2), inset=0.02)
 ```
+Fit a simple linear regression model of Rating on Moisture and display the model results.
 ```{r}
 model.1 <- lm(Rating ~ Moisture)
 summary(model.1)
 ```
+Fit a simple linear regression model of Rating on Sweetness and display the model results.
 ```{r}
 model.2 <- lm(Rating ~ Sweetness)
 summary(model.2)
 detach(pastry)
 ```
-Female stat students
+# Female stat students
 
-    Load the statfemales data.
-    Display a scatterplot matrix of the data.
-    Fit a multiple linear regression model of Height on momheight and dadheight and display the model results.
-    Create a residual plot.
+Load the statfemales data.
+Display a scatterplot matrix of the data.
 ```{r}
 statfemales <- read.table("DataL5/stat_females.txt", header=T)
 attach(statfemales)
 
-pairs(cbind(Height, momheight, dadheight))
+pairs(cbind(Height, momheight, dadheight), lower.panel = NULL)
 ```
+Fit a multiple linear regression model of Height on momheight and dadheight and display the model results.
 ```{r}
 model <- lm(Height ~ momheight + dadheight)
 summary(model)
 ```
-```{r}
+Create a residual plot.
+```{r  fig.height=3, fig.width=4}
 plot(fitted(model), residuals(model),
      panel.last = abline(h=0, lty=2))
 
 detach(statfemales)
 ```
-Hospital infections
+# Hospital infections
 
-    Load the infectionrisk data.
-    Fit a multiple linear regression model of InfctRsk on Stay, Age, and Xray and display the model results.
+Load the infectionrisk data.
+Fit a multiple linear regression model of InfctRsk on Stay, Age, and Xray and display the model results.
 ```{r}
 infectionrisk <- read.table("DataL5/infectionrisk.txt", header=T)
 attach(infectionrisk)
@@ -169,15 +170,10 @@ model <- lm(InfctRsk ~ Stay + Age + Xray)
 summary(model)
 detach(infectionrisk)
 ```
-Physiological measurements (using matrices)
+# Physiological measurements (using matrices)
 
-    Load the bodyfat data.
-    Fit a multiple linear regression model of BodyFat on Triceps, Thigh, and Midarm and store the model matrix, X.
-    Display model results.
-    Calculate MSE and (XTX)-1 and multiply them to find the the variance-covariance matrix of the regression parameters.
-    Use the variance-covariance matrix of the regression parameters to derive:
-        the regression parameter standard errors.
-        covariances and correlations between regression parameter estimates.
+Load the bodyfat data.
+Fit a multiple linear regression model of BodyFat on Triceps, Thigh, and Midarm and store the model matrix, X.
 ```{r message=FALSE}
 bodyfat <- read.table("DataL5/bodyfat2.txt", header=T)
 head(bodyfat)
@@ -187,14 +183,19 @@ attach(bodyfat)
 model <- lm(Bodyfat ~ Triceps + Thigh + Midarm, x=T)
 summary(model)
 ```
+Display model results.
 ```{r}
 anova(model)
 ```
+Calculate MSE and (XTX)-1 and multiply them to find the the variance-covariance matrix of the regression parameters.
 ```{r}
 MSE <- sum(residuals(model)^2)/model$df.residual # 6.150306
 X <- model$x
 XTXinv <- solve(t(X) %*% X)
 ```
+Use the variance-covariance matrix of the regression parameters to derive:
+* the regression parameter standard errors.
+* covariances and correlations between regression parameter estimates.
 ```{r}
 sqrt(MSE*diag(XTXinv)) # standard errors of the regression parameters
 ```
@@ -204,15 +205,13 @@ XTXinv[2,3]/sqrt(XTXinv[2,2]*XTXinv[3,3]) # cor(b1, b2) = -0.9991072
 
 detach(bodyfat)
 ```
-Peruvian blood pressure
+# Peruvian blood pressure
 
-    Load the peru data.
-    Calculate FracLife variable.
-    Fit full multiple linear regression model of Systol on nine predictors.
-    Fit reduced multiple linear regression model of Systol on four predictors.
-    Calculate SSE for the full and reduced models.
-    Calculate the general linear F statistic by hand and find the p-value.
-    Use the anova function with full and reduced models to display F-statistic and p-value directly.
+Load the peru data.
+Calculate FracLife variable.
+Fit full multiple linear regression model of Systol on nine predictors.
+
+Calculate the general linear F statistic by hand and find the p-value.
 ```{r message=FALSE}
 peru <- read.table("DataL5/peru.txt", header=T)
 attach(peru)
@@ -226,10 +225,13 @@ summary(model.1)
 ```{r}
 anova(model.1)
 ```
+Fit reduced multiple linear regression model of Systol on four predictors.
 ```{r}
 model.2 <- lm(Systol ~ Age + Years + FracLife + Weight)
 summary(model.2)
 ```
+Use the anova function with full and reduced models to display F-statistic and p-value directly.
+Calculate SSE for the full and reduced models.
 ```{r}
 anova(model.2)
 ```
@@ -239,16 +241,13 @@ anova(model.2, model.1)
 ```{r}
 detach(peru)
 ```
-Measurements of college students
+# Measurements of college students
 
-    Load the Physical data.
-    Fit full multiple linear regression model of Height on LeftArm, LeftFoot, HeadCirc, and nose.
-    Create a residual plot.
-    Fit reduced multiple linear regression model of Height on LeftArm and LeftFoot.
-    Calculate SSE for the full and reduced models.
-    Calculate the general linear F statistic by hand and find the p-value.
-    Use the anova function with full and reduced models to display F-statistic and p-value directly.
-    Calculate partial R-squared for (LeftArm | LeftFoot).
+Load the Physical data.
+Fit full multiple linear regression model of Height on LeftArm, LeftFoot, HeadCirc, and nose.
+
+Calculate SSE for the full and reduced models.
+Calculate the general linear F statistic by hand and find the p-value.
 ```{r}
 physical <- read.csv("DataL5/Physical.csv", header=T)
 attach(physical)
@@ -256,7 +255,8 @@ attach(physical)
 model.1 <- lm(Height ~ LeftArm + LeftFoot + HeadCirc + nose)
 summary(model.1)
 ```
-```{r}
+Create a residual plot.
+```{r  fig.height=3, fig.width=4}
 plot(fitted(model.1), residuals(model.1),
      panel.last = abline(h=0, lty=2))
 
@@ -264,6 +264,7 @@ plot(fitted(model.1), residuals(model.1),
 ```{r}
 anova(model.1)
 ```
+Fit reduced multiple linear regression model of Height on LeftArm and LeftFoot.
 ```{r}
 model.2 <- lm(Height ~ LeftArm + LeftFoot)
 summary(model.2)
@@ -275,13 +276,16 @@ anova(model.2)
 (240.18-238.35)/(52-50) / (238.35/50) # F = 0.1919446
 pf(0.1919446, 2, 50, lower.tail=F) # p-value = 0.8259579
 ```
+Use the anova function with full and reduced models to display F-statistic and p-value directly.
 ```{r}
 anova(model.2, model.1)
 ```
+
 ```{r}
 model.3 <- lm(Height ~ LeftFoot)
 anova(model.3)
 ```
+Calculate partial R-squared for (LeftArm | LeftFoot).
 ```{r}
 (347.33-240.18) / 347.33 # Partial R-squared (LeftArm | LeftFoot) = 0.3084962
 
