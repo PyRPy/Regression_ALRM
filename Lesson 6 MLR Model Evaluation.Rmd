@@ -2,30 +2,31 @@
 title: "Lesson 6: MLR Model Evaluation"
 output: html_notebook
 ---
-Heart attacks in rabbits
+# Heart attacks in rabbits
 https://newonlinecourses.science.psu.edu/stat501/node/424/
-    Load the coolhearts data.
-    Fit a multiple linear regression model of Infarc on Area, X2 (early cooling), and X3 (late cooling).
-    Display model results.
-    Create a scatterplot of the data with points marked by group and three lines representing the fitted regression equation for each group.
+Load the coolhearts data.
+Fit a multiple linear regression model of Infarc on Area, X2 (early cooling), and X3 (late cooling).
+Display model results.
+
 ```{r}
 coolhearts <- read.csv("DataL6/coolhearts.csv", header=T)
-colnames(coolhearts) <- c("Inf", "Area", "Group", "X2", "X3")
+colnames(coolhearts) <- c("Inf1", "Area", "Group", "X2", "X3")
 # str(coolhearts)
 coolhearts$X2 <- as.numeric(coolhearts$X2)
 coolhearts$X3 <- as.numeric(coolhearts$X3)
 # attach(coolhearts)
 # head(coolhearts)
 # tail(coolhearts)
-model.1 <- lm( Inf.~ Area + X2 + X3, data=coolhearts) # canno have 'inf' ?
+model.1 <- lm( Inf1 ~ Area + X2 + X3, data=coolhearts) # canno have 'inf' ? # changed to Inf1
 summary(model.1)
 ```
+Create a scatterplot of the data with points marked by group and three lines representing the fitted regression equation for each group.
 ```{r message=FALSE}
 attach(coolhearts)
-plot(Area, Inf., type="n", ylim=c(-0.2, 1),
+plot(Area, Inf1, type="n", ylim=c(-0.2, 1),
      xlab="Size of area at risk (grams)",
      ylab="Size of infarcted area (grams)")
-for (i in 1:32) points(Area[i], Inf.[i], pch=Group[i], col=Group[i])
+for (i in 1:32) points(Area[i], Inf1[i], pch=Group[i], col=Group[i])
 for (i in 1:3) lines(Area[Group==i], fitted(model.1)[Group==i], lty=i, col=i)
 legend("topleft", legend=c("no cooling", 
                            "late cooling",
@@ -33,25 +34,29 @@ legend("topleft", legend=c("no cooling",
        col=3:1, pch=3:1, inset=0.02)
 detach(coolhearts)
 ```
-Student heights and GPAs
+# Student heights and GPAs
 
-    Load the heightgpa data.
-    Fit a simple linear regression model of gpa on height.
-    Create a scatterplot of the data with a fitted simple linear regression line and a horizontal line at the mean of gpa.
-    Calculate SSE for the full and reduced models.
-    Calculate the overall F statistic by hand.
-    Find the p-value for the overall F statistic.
-    Display the overall F statistic and p-value in the model results.
+Load the heightgpa data.
+Fit a simple linear regression model of gpa on height.
+
+
+
+Display the overall F statistic and p-value in the model results.
 ```{r}
 heightgpa <- read.table("DataL6/heightgpa.txt", header=T)
 attach(heightgpa)
 
 model <- lm(gpa ~ height)
-
+```
+Create a scatterplot of the data with a fitted simple linear regression line and a horizontal line at the mean of gpa.
+```{r}
 plot(height,gpa,xlab="Height (inches)",ylab="Grade Point Average",
      panel.last = c(lines(sort(height), fitted(model)[order(height)]),
                     abline(h=mean(gpa), lty=2)))
 ```
+Calculate SSE for the full and reduced models.
+Calculate the overall F statistic by hand.
+Find the p-value for the overall F statistic.
 ```{r}
 sum(residuals(model)^2) # SSE_F = 9.705507
 mean(gpa) # 2.971714
@@ -64,15 +69,11 @@ summary(model) # F-statistic: 0.09381 on 1 and 33 DF,  p-value: 0.7613
 
 detach(heightgpa)
 ```
-Skin cancer mortality
+# Skin cancer mortality
 
-    Load the skincancer data.
-    Fit a simple linear regression model of Mort on Lat.
-    Create a scatterplot of the data with a fitted simple linear regression line and a horizontal line at the mean of Mort.
-    Calculate SSE for the full and reduced models.
-    Calculate the overall F statistic by hand.
-    Find the p-value for the overall F statistic.
-    Display the overall F statistic and p-value in the model results.
+Load the skincancer data.
+Fit a simple linear regression model of Mort on Lat.
+Create a scatterplot of the data with a fitted simple linear regression line and a horizontal line at the mean of Mort.
 ```{r}
 skincancer <- read.table("DataL6/skincancer.txt", header=T)
 attach(skincancer)
@@ -85,6 +86,9 @@ plot(Lat,Mort,xlab="Latitude (at center of state)",
                     abline(h=mean(Mort), lty=2)))
 
 ```
+Calculate SSE for the full and reduced models.
+Calculate the overall F statistic by hand.
+Find the p-value for the overall F statistic.
 ```{r}
 sum(residuals(model)^2) # SSE_F = 17173.07
 mean(Mort) # 152.8776
@@ -92,18 +96,18 @@ sum((Mort-mean(Mort))^2) # SSE_R = 53637.27
 ((53637.27-17173.07)/1) / (17173.07/47) # overall F-statistic = 99.7968
 pf(99.7968, 1, 47, lower.tail=F) # p-value = 3.309471e-13
 ```
+Display the overall F statistic and p-value in the model results.
 ```{r}
 summary(model) # F-statistic:  99.8 on 1 and 47 DF,  p-value: 3.309e-13
 
 detach(skincancer)
 ```
-Alcoholism and muscle strength
+# Alcoholism and muscle strength
 
-    Load the alcoholarm data.
-    Fit a simple linear regression model of strength on alcohol.
-    Calculate SSE for the full and reduced models.
-    Calculate the overall F statistic by hand.
-    Display the overall F statistic and p-value in the model results and in the anova table.
+Load the alcoholarm data.
+Fit a simple linear regression model of strength on alcohol.
+Calculate SSE for the full and reduced models.
+Calculate the overall F statistic by hand.
 ```{r}
 alcoholarm <- read.table("DataL6/alcoholarm.txt", header=T)
 attach(alcoholarm)
@@ -114,23 +118,18 @@ sum(residuals(model)^2) # SSE_F = 720.2749
 ((1224.315-720.2749)/1) / (720.2749/48) # F = 33.58985
 summary(model) # F-statistic: 33.59 on 1 and 48 DF,  p-value: 5.136e-07
 ```
+Display the overall F statistic and p-value in the model results and in the anova table.
 ```{r}
 anova(model)
 
 detach(alcoholarm)
 ```
-Allen cognitive level study
+# Allen cognitive level study
 
-    Load the allentest data.
-    Calculate SSTO.
-    Fit SLR model of ACL on Vocab and display anova table (with sequential sums of squares).
-    Fit MLR model of ACL on Vocab and SDMT and display anova table (with sequential sums of squares).
-    Calculate SSR(Vocab, SDMT) by hand using sequential sums of squares.
-    Fit SLR model of ACL on SDMT and display anova table (with sequential sums of squares).
-    Fit MLR model of ACL on SDMT and Vocab and display anova table (with sequential sums of squares).
-    Calculate SSR(Vocab, SDMT) by hand using sequential sums of squares.
-    Fit MLR model of ACL on SDMT, Vocab, and Abstract and display anova table (with sequential sums of squares).
-    Calculate SSR(Vocab, Abstract | SDMT) by hand using sequential sums of squares.
+Load the allentest data.
+Calculate SSTO.
+Fit SLR model of ACL on Vocab and display anova table (with sequential sums of squares).
+Fit MLR model of ACL on Vocab and SDMT and display anova table (with sequential sums of squares).
 ```{r}
 allentest <- read.table("DataL6/allentest.txt", header=T)
 attach(allentest)
@@ -141,42 +140,39 @@ sum((ACL-mean(ACL))^2) # SSTO = 43.04957
 model.1 <- lm(ACL ~ Vocab)
 anova(model.1)
 ```
+Calculate SSR(Vocab, SDMT) by hand using sequential sums of squares.
 ```{r}
 model.13 <- lm(ACL ~ Vocab + SDMT)
 anova(model.13) # Sequential (type I) SS
 ```
 Calculate by hand: SSR(Vocab, SDMT) = 2.6906 + 9.0872 = 11.7778
 
+Fit SLR model of ACL on SDMT and display anova table (with sequential sums of squares).
 ```{r}
 model.3 <- lm(ACL ~ SDMT)
 anova(model.3)
 ```
+Fit MLR model of ACL on SDMT and Vocab and display anova table (with sequential sums of squares).
+Calculate SSR(Vocab, SDMT) by hand using sequential sums of squares.
 ```{r}
 model.31 <- lm(ACL ~ SDMT + Vocab)
 anova(model.31) # Sequential (type I) SS
 ```
 Calculate by hand: SSR(Vocab, SDMT) = 11.6799 + 0.0979 = 11.7778
+
+Fit MLR model of ACL on SDMT, Vocab, and Abstract and display anova table (with sequential sums of squares).
+Calculate SSR(Vocab, Abstract | SDMT) by hand using sequential sums of squares.
 ```{r}
 model.312 <- lm(ACL ~ SDMT + Vocab + Abstract)
-anova(model.312) # Sequential (type I) SS
+anova(model.312) # Sequential (type I) SS # default ?
 detach(allentest)
 ```
 Calculate by hand: SSR(Vocab, Abstract | SDMT) = 0.0979 + 0.5230 = 0.6209
 
-Heart attacks in rabbits (revisited)
+# Heart attacks in rabbits (revisited)
 
-    Load the coolhearts data.
-    Fit a multiple linear regression model of Infarc on Area, X2 (early cooling), and X3 (late cooling).
-    Test all slope parameters equal 0.
-        Display the overall F statistic and p-value in the model results.
-    Test one slope parameter is 0.
-        Use the Anova function from the car package to display F-statistic in anova table using adjusted (type III) sums of squares.
-        Or (easier), use t-test from model results.
-    Test a subset of slope parameters is 0.
-        Fit full model (with Area, X2 , and X3) and reduced model (Area only), and calculate general linear F-statistic.
-        Or, use the anova function with full model to display anova table with sequential (type I) sums of squares, and calculate partial F-statistic.
-        Or (easier), use the anova function with full and reduced models to display F-statistic and p-value directly.
-    Calculate partial R-squared for (X2, X3 | Area).
+Load the coolhearts data.
+Fit a multiple linear regression model of Infarc on Area, X2 (early cooling), and X3 (late cooling).
 ```{r message=FALSE}
 coolhearts <- read.csv("DataL6/coolhearts.csv", header=T)
 colnames(coolhearts) <- c("Infarc", "Area", "Group", "X2", "X3")
@@ -187,36 +183,45 @@ coolhearts$X3 <- as.numeric(coolhearts$X3)
 model.1 <- lm(Infarc ~ Area + X2 + X3)
 summary(model.1)
 ```
+Test all slope parameters equal 0.
+Display the overall F statistic and p-value in the model results.
+Test one slope parameter is 0.
+Or, use the anova function with full model to display anova table with sequential (type I) sums of squares, and calculate partial F-statistic.
 ```{r}
 anova(model.1) # Sequential (type I) SS
 ```
+Use the Anova function from the car package to display F-statistic in anova table using adjusted (type III) sums of squares.
 ```{r}
 library(alr3)
 Anova(model.1, type="III") # Adjusted (type III) SS
 ```
- Hand calculation: F for Area = (0.63742/1) / (0.54491/28) = 32.75359
- 
+Hand calculation: F for Area = (0.63742/1) / (0.54491/28) = 32.75359
+
+Or (easier), use t-test from model results. 
 ```{r}
 pf(32.75359, 1, 28, lower.tail=F) # 3.865451e-06
 5.723^2 # 32.75273 (t-statistic squared = F-statistic) 
 ```
+Test a subset of slope parameters is 0.
+Fit full model (with Area, X2 , and X3) and reduced model (Area only), and calculate general linear F-statistic.
 ```{r}
 model.2 <- lm(Infarc ~ Area)
 anova(model.2)
 ((0.87926-0.54491)/(30-28)) / (0.54491/28) # General linear F-stat = 8.590226
-((0.31453+0.01981)/2) / (0.54491/28) # Partial F-stat = 8.589969
+((0.31453+0.01981)/2) / (0.54491/28) # Partial F-stat = 8.589969 # two ways to get same answer
 pf(8.59, 2, 28, lower.tail=F) # 0.001233006
 ```
+Or (easier), use the anova function with full and reduced models to display F-statistic and p-value directly.
 ```{r}
 anova(model.2, model.1)
 ```
+Calculate partial R-squared for (X2, X3 | Area).
 ```{r}
 0.31453+0.01981 # SSR(X2, X3 | Area) = 0.33434
 # SSE(Area) = 0.87926
-0.33434 / 0.87926 # Partial R-squared (X2, X3 | Area) = 0.3802516
+0.33434 / 0.87926 # Partial R-squared (X2, X3 | Area) = 0.3802516 # here we care about SSE
 
 detach(coolhearts)
 ```
- 
 
 
