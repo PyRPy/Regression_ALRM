@@ -4,21 +4,20 @@ output: html_notebook
 ---
 https://onlinecourses.science.psu.edu/stat501/node/431/
 # Galton peas (nonconstant variance and weighted least squares)
-
-    Load the galton data.
-    Fit an ordinary least squares (OLS) simple linear regression model of Progeny vs Parent.
-    Fit a weighted least squares (WLS) model using weights = 1/SD2.
-    Create a scatterplot of the data with a regression line for each model.
+Load the galton data.
+Fit an ordinary least squares (OLS) simple linear regression model of Progeny vs Parent.
 ```{r}
 galton <- read.table("DataL13/galton.txt", header=T)
 
 model.1 <- lm(Progeny ~ Parent, data=galton)
 summary(model.1)
 ```
+Fit a weighted least squares (WLS) model using weights = 1/SD2.
 ```{r}
 model.2 <- lm(Progeny ~ Parent, weights=1/SD^2, data=galton)
 summary(model.2)
 ```
+Create a scatterplot of the data with a regression line for each model.
 ```{r}
 with(data=galton, 
 plot(x=Parent, y=Progeny, ylim=c(0.158,0.174),
@@ -31,39 +30,37 @@ legend("topleft", col=c("blue","red"), lty=1,
 ```
 # Computer-assisted learning (nonconstant variance and weighted least squares)
 
-    Load the ca_learning data.
-    Create a scatterplot of the data.
-    Fit an OLS model.
-    Plot the OLS residuals vs num.responses.
-    Plot the absolute OLS residuals vs num.responses.
-    Calculate fitted values from a regression of absolute residuals vs num.responses.
-    Fit a WLS model using weights = 1/(fitted values)2.
-    Create a scatterplot of the data with a regression line for each model.
-    Plot the WLS standardized residuals vs num.responses.
-
+Load the ca_learning data.
+Create a scatterplot of the data.
 ```{r}
 ca_learning <- read.table("DataL13/ca_learning_new.csv", sep=",", header=T)
 
 with(data=ca_learning, plot(x=num.responses, y=cost))
 ```
+Fit an OLS model.
 ```{r}
 model.1 <- lm(cost ~ num.responses, data=ca_learning)
 summary(model.1)
 ```
+Plot the OLS residuals vs num.responses.
 ```{r}
 with(data=ca_learning,
 plot(num.responses, residuals(model.1)))
 ```
+Plot the absolute OLS residuals vs num.responses.
 ```{r}
 with(data=ca_learning,
 plot(num.responses, abs(residuals(model.1))))
 ```
+Calculate fitted values from a regression of absolute residuals vs num.responses.
+Fit a WLS model using weights = 1/(fitted values)2.
 ```{r}
 wts <- 1/fitted(lm(abs(residuals(model.1)) ~ num.responses, data=ca_learning))^2
 
 model.2 <- lm(cost ~ num.responses, weights=wts, data=ca_learning)
 summary(model.2)
 ```
+Create a scatterplot of the data with a regression line for each model.
 ```{r}
 with(data=ca_learning,
 plot(x=num.responses, y=cost, ylim=c(50,95),
@@ -73,54 +70,46 @@ plot(x=num.responses, y=cost, ylim=c(50,95),
 legend("topleft", col=c("blue","red"), lty=1,
        inset=0.02, legend=c("OLS", "WLS"))
 ```
+Plot the WLS standardized residuals vs num.responses.
 ```{r}
 with(data=ca_learning,
 plot(num.responses, rstandard(model.2)))
 ```
 # Market share (nonconstant variance and weighted least squares)
-
-    Load the marketshare data.
-    Fit an OLS model.
-    Plot the OLS residuals vs fitted values with points marked by Discount.
-    Use the tapply function to calculate the residual variance for Discount=0 and Discount=1.
-    Fit a WLS model using weights = 1/variance for Discount=0 and Discount=1.
-    Plot the WLS standardized residuals vs fitted values.
+Load the marketshare data.
+Fit an OLS model.
 ```{r}
 marketshare <- read.table("DataL13/market_share.csv", sep=",",  header=T)
 head(marketshare)
 model.1 <- lm(Market.share ~ Price + Discount + Promotion, data=marketshare)
 summary(model.1)
 ```
+Plot the OLS residuals vs fitted values with points marked by Discount.
 ```{r}
-
 plot(fitted(model.1), residuals(model.1), col=marketshare$Discount+1)
 ```
+Use the tapply function to calculate the residual variance for Discount=0 and Discount=1.
 ```{r}
-
 vars <- tapply(residuals(model.1), marketshare$Discount, var)
 vars
 ```
+Fit a WLS model using weights = 1/variance for Discount=0 and Discount=1.
 ```{r}
 attach(marketshare)
 wts <- Discount/vars[2] + (1-Discount)/vars[1]
 model.2 <- lm(Market.share ~ Price + Discount + Promotion, weights=wts)
 summary(model.2)
-detach(marketshare)
-
 ```
+Plot the WLS standardized residuals vs fitted values.
 ```{r}
 plot(fitted(model.2), rstandard(model.2), col=marketshare$Discount+1)
-
+detach(marketshare)
 ```
 # Home price (nonconstant variance and weighted least squares)
 
-    Load the realestate data.
-    Calculate log transformations of the variables.
-    Fit an OLS model.
-    Plot the OLS residuals vs fitted values.
-    Calculate fitted values from a regression of absolute residuals vs fitted values.
-    Fit a WLS model using weights = 1/(fitted values)2.
-    Plot the WLS standardized residuals vs fitted values.
+Load the realestate data.
+Calculate log transformations of the variables.
+Fit an OLS model.
 ```{r}
 realestate <- read.table("DataL13/home_price.csv", sep=",",  header=T)
 
@@ -136,17 +125,20 @@ logX2 <- log(Lot)
 model.1 <- lm(logY ~ logX1 + logX2)
 summary(model.1)
 ```
+Plot the OLS residuals vs fitted values.
 ```{r}
 plot(fitted(model.1), residuals(model.1))
 ```
+Calculate fitted values from a regression of absolute residuals vs fitted values.
+Fit a WLS model using weights = 1/(fitted values)2.
 ```{r}
 wts <- 1/fitted(lm(abs(residuals(model.1)) ~ fitted(model.1)))^2
 model.2 <- lm(logY ~ logX1 + logX2, weights=wts)
 summary(model.2)
 ```
+Plot the WLS standardized residuals vs fitted values.
 ```{r}
 plot(fitted(model.2), rstandard(model.2))
 
 detach(realestate)
 ```
-
