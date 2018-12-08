@@ -20,7 +20,7 @@ model.1 <- glm(REMISS ~ CELL + SMEAR + INFIL + LI + BLAST + TEMP, family="binomi
 summary(model.1)
 
 ```
-```{r}
+```{r message=TRUE, warning=FALSE}
 confint.default(model.1) # based on asymptotic normality
 confint(model.1) # based on profiling the least-squares estimation surface
 ```
@@ -57,9 +57,12 @@ hoslem.test(model.2$y, fitted(model.2), g=9)
 1-model.2$deviance/model.2$null.deviance # "R-squared" = 0.2414424
 ```
 Create residual plots using Pearson and deviance residuals.
-```{r}
+```{r, fig.height=6, fig.width=6}
+par(mfrow=c(2,1))
 plot(1:27, residuals(model.2, type="pearson"), type="b")
+abline(h=0)
 plot(1:27, residuals(model.2, type="deviance"), type="b")
+abline(h=0)
 ```
 Calculate hat values (leverages), studentized residuals, and Cook's distances.
 ```{r}
@@ -75,7 +78,6 @@ detach(leukemia)
 ```
 ```{r}
 # Disease outbreak (logistic regression)
-# 
 # Load the disease outbreak data.
 disease <- read.table("DataL15/DiseaseOutbreak.csv", sep=",", header=T)
 attach(disease)
@@ -99,7 +101,7 @@ model.2 <- glm(Disease ~ Age + Middle + Lower + Sector, family="binomial")
 ```
 ```{r}
 # Conduct a likelihood ratio (or deviance) test for the five interactions.
-anova(model.2, model.1, test="Chisq")
+anova(model.2, model.1, test="Chisq") # pay attention to the sequence or order of the models
 ```
 ```{r}
 # Display the analysis of deviance table with sequential deviances.
@@ -210,6 +212,9 @@ summary(influence.measures(model.1))
 # Calculate hat values (leverages) and studentized residuals.
 residuals(model.1)[8] # 1.974329
 rstudent(model.1)[8] # 2.028255
+
+residuals(model.1)[10] # 1.974329
+rstudent(model.1)[10] # 2.028255
 
 detach(poisson)
 ```
