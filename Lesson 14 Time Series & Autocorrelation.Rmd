@@ -10,21 +10,21 @@ https://onlinecourses.science.psu.edu/stat501/node/418/
 * Load the google_stock data in the usual way using read-table.
 * Use the ts function to convert the price variable to a time series.
 * Create a plot of partial autocorrelations of price.
-```{r}
+```{r message=FALSE}
 library(zoo)
 google <- read.csv("DataL14/google_stock.csv", header=T)
 google.ts <- ts(google$Price)
-head(google.ts)
+# head(google.ts)
 plot(google.ts)
 ```
-```{r}
+```{r, fig.height=4, fig.width=7}
 pacf(google.ts)
 ```
 Calculate a lag-1 price variable (note that the lag argument for the function is -1, not +1).
 Create a scatterplot of price vs lag1price.
 ```{r}
 lag1price <- lag(google.ts, -1)
-plot(google.ts ~ lag1price, xy.labels=F)
+plot(google.ts ~ lag1price, xy.labels=FALSE) # CORRECTED FROM 'F' TO 'FALSE' ?
 ```
 * Use the ts.intersect function to create a dataframe containing price and lag1price.
 * Fit a simple linear regression model of price vs lag1price (a first-order autoregression model).
@@ -35,7 +35,6 @@ summary(lm(google.ts ~ lag1price, data=lagdata))
 # Earthquakes (autoregression model)
 
 Fit a multiple linear regression model of Quakes versus the three lag variables (a third-order autoregression model).
-
 Load the earthquakes data.
 Create a time series plot of the data.
 ```{r}
@@ -62,7 +61,6 @@ summary(lm(Quakes.ts ~ lag1Quakes + lag2Quakes + lag3Quakes, data=lagdata))
 detach(earthquakes)
 ```
 # Blaisdell company (regression with autoregressive errors)
-    
 Load the blaisdell data.
 Fit a simple linear regression model of comsales vs indsales.
 ```{r}
