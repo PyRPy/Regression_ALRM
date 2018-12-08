@@ -4,28 +4,26 @@ output: html_notebook
 ---
 https://onlinecourses.science.psu.edu/stat501/node/430/
 
-```{r}
+```{r message=FALSE}
 library(ggplot2)
 ```
 
 # Blood pressure (multicollinearity)
-
 * Load the bloodpress data.
 * Create scatterplot matrices of the data.
 * Calculate correlations between the variables.
 ```{r}
 bloodpress <- read.table("DataL12/bloodpress.txt", header=T)
 
-pairs(bloodpress[,c(2:5)])
+pairs(bloodpress[,c(2:5)], lower.panel = NULL)
 ```
 ```{r}
-pairs(bloodpress[,c(2,6:8)])
+pairs(bloodpress[,c(2,6:8)], lower.panel = NULL)
 ```
 ```{r}
 round(cor(bloodpress[,c(2:8)]),3)
 ```
 # Uncorrelated predictors (no multicollinearity)
-
 * Load the uncorrpreds data.
 * Create a scatterplot matrix of the data.
 * Calculate the correlation between the predictors.
@@ -72,12 +70,11 @@ scatter3d(y ~ x1 + x2)
 detach(uncorrpreds)
 ```
 # Blood pressure (predictors with almost no multicollinearity)
-
 * Load the bloodpress data.
 * Create a scatterplot matrix of the data.
 ```{r}
 bloodpress <- read.table("DataL12/bloodpress.txt", header=T)
-pairs(bloodpress[,c(2,5,8)])
+pairs(bloodpress[,c(2,5,8)], lower.panel = NULL)
 ```
 * Fit a simple linear regression model of BP vs Stress.
 * Fit a simple linear regression model of BP vs BSA.
@@ -110,7 +107,7 @@ detach(bloodpress)
 * Load the bloodpress data.
 * Create a scatterplot matrix of the data.
 ```{r}
-pairs(bloodpress[,c(2,5,4)])
+pairs(bloodpress[,c(2,5,4)], lower.panel = NULL)
 
 ```
 * Fit a simple linear regression model of BP vs Weight.
@@ -155,16 +152,12 @@ predict(model.12, interval="prediction",
         newdata=data.frame(Weight=92, BSA=2))
 ```
 # Poverty and teen birth rate (high multicollinearity)
-
- 
-
-
 * Load the poverty data and remove the District of Columbia.
 * Create a scatterplot matrix of the data.
 ```{r}
 poverty <- read.table("DataL12/poverty.txt", header=T)
 poverty <- poverty[poverty$Location!="District_of_Columbia",]
-pairs(poverty[,c(2:4)])
+pairs(poverty[,c(2:4)], lower.panel = NULL)
 ```
 * Fit a simple linear regression model of PovPct vs Brth15to17.
 * Fit a simple linear regression model of PovPct vs Brth18to19.
@@ -182,9 +175,7 @@ model.12 <- lm(PovPct ~ Brth15to17 + Brth18to19, data=poverty)
 summary(model.12)
 ```
 # Blood pressure (high multicollinearity)
-
 * Load the bloodpress data.
-
 * Fit a multiple linear regression model of BP vs Age + Weight + BSA + Dur + Pulse + Stress.
 * Use the vif function in the car package to calculate variance inflation factors.
 ```{r}
@@ -218,7 +209,7 @@ vif(model.3)
 * Calculate the correlation between Vocab and Abstract.
 ```{r}
 allentestn23 <- read.table("DataL12/allentestn23.csv", sep=",",  header=T)
-pairs(allentestn23[,2:5])
+pairs(allentestn23[,2:5], lower.panel = NULL)
 ```
 ```{r}
 attach(allentestn23)
@@ -237,7 +228,7 @@ vif(model.1)
 ```{r}
 allentest <- read.table("DataL12/allentest.txt", header=T)
 
-pairs(allentest[,2:5])
+pairs(allentest[,2:5], lower.panel = NULL)
 ```
 ```{r}
 attach(allentest)
