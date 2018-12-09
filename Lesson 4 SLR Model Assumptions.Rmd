@@ -6,7 +6,6 @@ https://newonlinecourses.science.psu.edu/stat501/node/276/
 In short, you'll need to learn how to worry just the right amount. Worry when you should, and don't overworry when you shouldn't! And when you are worried, there are  remedies available, which we'll learn more about later in the course. For example, one thing to try is transforming either the response variable, predictor variable, or both - there is an example of this in Section 4.8 and we'll see more examples in Lesson 9.
 
 # Alcohol consumption and muscle strength
-
 Load the alcoholarm data.
 Fit a simple linear regression model with y = strength and x = alcohol.
 Display model results.
