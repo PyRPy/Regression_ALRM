@@ -33,12 +33,9 @@ Anova(model, type="III") # Adjusted (type III) SS
 detach(iqsize)
 ```
 # Underground air quality
-
-    Load the babybirds data.
-    Display a scatterplot matrix of the data.
-    
-    
-    Use the Anova function from the car package to display anova table with adjusted (type III) sums of squares.
+Load the babybirds data.
+Display a scatterplot matrix of the data.
+Use the Anova function from the car package to display anova table with adjusted (type III) sums of squares.
 ```{r message=FALSE}
 babybirds <- read.table("DataL5/babybirds.txt", header=T)
 attach(babybirds)
@@ -242,7 +239,6 @@ anova(model.2, model.1)
 detach(peru)
 ```
 # Measurements of college students
-
 Load the Physical data.
 Fit full multiple linear regression model of Height on LeftArm, LeftFoot, HeadCirc, and nose.
 
