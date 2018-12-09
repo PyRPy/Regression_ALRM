@@ -8,7 +8,7 @@ Load the galton data.
 Fit an ordinary least squares (OLS) simple linear regression model of Progeny vs Parent.
 ```{r}
 galton <- read.table("DataL13/galton.txt", header=T)
-
+head(galton)
 model.1 <- lm(Progeny ~ Parent, data=galton)
 summary(model.1)
 ```
@@ -29,7 +29,6 @@ legend("topleft", col=c("blue","red"), lty=1,
 
 ```
 # Computer-assisted learning (nonconstant variance and weighted least squares)
-
 Load the ca_learning data.
 Create a scatterplot of the data.
 ```{r}
@@ -114,7 +113,7 @@ Fit an OLS model.
 realestate <- read.table("DataL13/home_price.csv", sep=",",  header=T)
 
 head(realestate)
-realestate <- realestate[,-1]
+realestate <- realestate[,-1] # remove 'ID'
 
 colnames(realestate) <- c("SalePrice", "SqFeet", "Lot")
 attach(realestate)
