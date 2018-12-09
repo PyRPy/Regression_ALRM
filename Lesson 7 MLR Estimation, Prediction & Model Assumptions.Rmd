@@ -2,7 +2,7 @@
 title: "Lesson 7: MLR Estimation, Prediction & Model Assumptions"
 output: html_notebook
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 # IQ and physical characteristics (confidence and prediction intervals)
 
