@@ -6,7 +6,7 @@ output: html_notebook
 https://newonlinecourses.science.psu.edu/stat501/node/419/
 Create the temperature data and produce a scatterplot with points and lines:
 
-```{r message=FALSE}
+```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 C <- seq(0, 50, by=5)
 F <- (9/5)*C+32
@@ -22,7 +22,6 @@ skincancer <- read.table("Data1/skincancer.txt", header=T)
 attach(skincancer)
 head(skincancer)
 model <- lm(Mort ~ Lat)
-
 ```
 ```{r}
 # plot(x=Lat, y=Mort,
