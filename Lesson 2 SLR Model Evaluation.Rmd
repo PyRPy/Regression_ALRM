@@ -190,11 +190,7 @@ detach(handheight)
 
 # Checking account deposits
 
-    
-    
-    
-    
-    Display usual analysis of variance table.
+Display usual analysis of variance table.
 Load the newaccounts data.
 ```{r}
 newaccounts <- read.table("Data2/newaccounts.txt", header=T)
