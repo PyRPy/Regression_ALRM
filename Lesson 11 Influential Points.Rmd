@@ -2,15 +2,13 @@
 title: "Lesson 11: Influential Points"
 output: html_notebook
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 https://onlinecourses.science.psu.edu/stat501/node/429/
 ```{r}
 library(knitr)
 ```
-
 # Influence 1 (no influential points)
-
 Load the influence1 data.
 Create a scatterplot of the data.
 ```{r message=FALSE}
@@ -24,7 +22,6 @@ qplot(data=influence1, x=x, y=y)
 detach(influence1)
 ```
 # Influence 2 (outlier, low leverage, not influential)
-
 Load the influence2 data.
 Create a scatterplot of the data.
 ```{r message=FALSE}
@@ -35,21 +32,21 @@ qplot(data= influence2, x=x, y=y)
 ```
 Fit a simple linear regression model to all the data.
 ```{r}
-model.1 <- lm(y ~ x)
+model.1 <- lm(y ~ x, data = influence2)
 summary(model.1)
 ```
 Fit a simple linear regression model to the data excluding observation #21.
 ```{r}
-model.2 <- lm(y ~ x, subset=1:20) # exclude obs #21
+model.2 <- lm(y ~ x, subset = 1:20) # exclude obs #21
 summary(model.2)
 ```
 Add regression lines to the scatterplot, one for each model.
+## clean the data if not working...!!!
 ```{r}
 plot(x=x, y=y, col=ifelse(Row<=20, "blue", "red"),
      panel.last = c(lines(sort(x), fitted(model.1)[order(x)], col="red"),
-                    lines(sort(x[-21]), fitted(model.2)[order(x[-21])],
-                          col="red", lty=2)),
-     data=influence2)
+                    lines(sort(x), fitted(model.2)[order(x)],
+                          col="red", lty=2)))
 legend("topleft", col="red", lty=c(1,2),
        inset=0.02, legend=c("Red point included", "Red point excluded"))
 ```
@@ -84,7 +81,6 @@ plot(cook)
 detach(influence2)
 ```
 # Influence 3 (high leverage, not an outlier, not influential)
-
 Load the influence3 data.
 Create a scatterplot of the data.
 ```{r}
@@ -168,6 +164,11 @@ legend("topleft", col="red", lty=c(1,2),
 Calculate leverages, DFFITS, Cook's distances.
 You can clearly see the slope for model.1 is `r round(model.1$coefficients["x"], 4)` while the slope for model.2 is
 `r round(model.2$coefficients["x"], 4)`
+
+## Potentially influential observations 
+```{r}
+summary(influence.measures(model.1))
+```
 
 ```{r}
 lev <- hatvalues(model.1)
