@@ -2,7 +2,7 @@
 title: "Lesson 10: Model Building"
 output: html_notebook
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 https://onlinecourses.science.psu.edu/stat501/node/428/
@@ -89,7 +89,7 @@ you can drop x4 (not significant change after drop x4)
 finally select x1 and x2 as predictors
 ```{r}
 model.12 <- lm(y ~ x1 + x2)
-add1(model.12, ~ . + x3 + x4, test="F") # also has higg p-value
+add1(model.12, ~ . + x3 + x4, test="F") # also has high p-value
 detach(cement)
 ```
 # IQ and body size (variable selection using stepwise regression)
@@ -127,7 +127,7 @@ don't drop any, they are all 'significant'
 add1(model.12, ~ . + Weight, test="F")
 detach(iqsize)
 ```
-from p-value, we can tell 'Weight' is insignificant
+* from p-value, we can tell 'Weight' is insignificant
 
 # Blood pressure (variable selection using stepwise regression)
 
@@ -145,10 +145,10 @@ Create scatterplot matrices of the data.
 bloodpress <- read.table("DataL10/bloodpress.txt", header=T)
 attach(bloodpress)
 
-pairs(bloodpress[,c(2:5)])
+pairs(bloodpress[,c(2:5)], lower.panel = NULL)
 ```
 ```{r}
-pairs(bloodpress[,c(2,6:8)])
+pairs(bloodpress[,c(2,6:8)], lower.panel = NULL)
 ```
 Use the add1 and drop1 functions to conduct stepwise regression.
 ```{r}
@@ -165,32 +165,30 @@ to add 'Age' as second predictor
 model.12 <- lm(BP ~ Age + Weight)
 drop1(model.12, ~ ., test="F")
 ```
-don't any , Age and Weight are all significant
+* don't drop any , Age and Weight are all significant
 ```{r}
 add1(model.12, ~ . + BSA + Dur + Pulse + Stress, test="F")
 ```
-to add BSA
+* to add BSA (lowest AIC)
 ```{r}
 model.123 <- lm(BP ~ Age + Weight + BSA)
 drop1(model.123, ~ ., test="F")
 ```
-to keep all three predictors
+* to keep all three predictors
 ```{r}
 add1(model.123, ~ . + Dur + Pulse + Stress, test="F")
 detach(bloodpress)
 ```
-p-value above from "F" test, shows there is no significant predictors anymore
+* p-value above from "F" test, shows there is no significant predictors anymore
 
 # Cement hardening (variable selection using best subsets regression)
-
 Load the cement data.
-```{r}
+```{r message=FALSE}
 cement <- read.table("DataL10/cement.txt", header=T)
 attach(cement)
 ```
-
 Use the regsubsets function in the leaps package to conduct variable selection using exhaustive search (i.e., best subsets regression). Note that the nbest=2 argument returns the best two models with 1, 2, ..., k predictors.
-```{r message=FALSE}
+```{r message=FALSE, warning=FALSE}
 library(leaps)
 subset <- regsubsets(y ~ x1 + x2 + x3 + x4, method="exhaustive", nbest=2, data=cement)
 cbind(summary(subset)$outmat, round(summary(subset)$adjr2, 3), round(summary(subset)$cp, 1))
@@ -234,7 +232,6 @@ vif(model.12)
 ```{r}
 plot(x=fitted(model.12), y=rstandard(model.12),
      panel.last = abline(h=0, lty=2))
-
 ```
 ```{r}
 qqnorm(rstandard(model.12), main="", datax=TRUE)
@@ -247,7 +244,6 @@ ad.test(rstandard(model.12)) # A = 0.6136, p-value = 0.08628
 detach(cement)
 ```
 # IQ and body size (variable selection using best subsets regression)
-
 Load the iqsize data.
 ```{r}
 iqsize <- read.table("DataL10/iqsize.txt", header=T)
@@ -259,7 +255,7 @@ library(leaps)
 subset <- regsubsets(PIQ ~ Brain + Height + Weight, method="exhaustive", nbest=2, data=iqsize)
 cbind(summary(subset)$outmat, round(summary(subset)$adjr2, 3), round(summary(subset)$cp, 1))
 ```
-from the results above, both adj-R2 and Cp are pointing to 'Brain' and 'Height' as good candidate for predictors.
+* from the results above, both adj-R2 and Cp are pointing to 'Brain' and 'Height' as good candidate for predictors.
 
 Fit model with Brain and Height and note the variance inflation factors are acceptable, adjusted R2 is as good as it gets with this dataset, and a residual analysis and normality test yields no concerns.
 ```{r}
@@ -270,8 +266,7 @@ summary(model.12)
 library(car)
 vif(model.12)
 ```
-```{r}
-
+```{r, fig.height=3, fig.width=7}
 par(mfrow=c(1,2))
 
 plot(x=fitted(model.12), y=rstandard(model.12),
