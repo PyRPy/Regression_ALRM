@@ -2,7 +2,7 @@
 title: "Lesson 8: Categorical Predictors"
 output: html_notebook
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 # Birthweight and smoking (2-level categorical predictor, additive model)
 https://onlinecourses.science.psu.edu/stat501/node/426/
@@ -22,7 +22,7 @@ head(birthsmokers)
 # str(birthsmokers)
 birthsmokers$Smoke <- as.factor(birthsmokers$Smoke)
 str(birthsmokers)
-pairs(cbind(Wgt, Gest, Smoke))
+pairs(cbind(Wgt, Gest, Smoke), lower.panel = NULL)
 # head(birthsmokers)
 ```
 Build linear model as follows :
