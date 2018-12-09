@@ -37,13 +37,6 @@ predict(model, newdata=data.frame(ht=64))
 detach(heightweight)
 ```
 # Skin cancer mortality
-
-
-   
-    
-    
-   
-   
 Load the skin cancer data.
 Fit a simple linear regression model with y = Mort and x = Lat.
 ```{r}
