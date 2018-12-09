@@ -2,11 +2,10 @@
 title: "Lesson 9: Data Transformations"
 output: html_notebook
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 # Word recall (log-transforming a predictor)
-
 Load the wordrecall data.
 ```{r}
 wordrecall <- read.table("DataL9/wordrecall.txt", header=T)
@@ -81,7 +80,7 @@ qqnorm(residuals(model.3), main="", datax=TRUE)
 qqline(residuals(model.3), datax=TRUE)
 ```
 ```{r}
-ad.test(residuals(model.3)) 
+ad.test(residuals(model.3)) # not normal
 ```
 Use prop on log(time) model to find:
   95% prediction interval for prop at time 1000.
@@ -93,6 +92,10 @@ predict(model.2, interval="prediction",
 ```{r}
 confint(model.2)[2,]*log(10) # 95% CI for 10-fold increase in time, beta1*ln(10)
 ```
+```{r}
+detach(wordrecall)
+```
+
 # Mammal gestation (log-transforming the response)
 (Again, transforming the y values should be considered when non-normality and/or unequal variances are the main problems with the model.)
 Load the mammgest data.
@@ -166,7 +169,7 @@ exp(10*confint(model.2)[2,]) # 95% CI
 detach(mammgest)
 ```
 # Shortleaf pine trees (log-transforming both response and predictor)
-(You might have to do this when everything seems wrong — when the regression function is not linear and the error terms are not normal and have unequal variances. In general (although not always!))
+(You might have to do this when everything seems wrong when the regression function is not linear and the error terms are not normal and have unequal variances. In general (although not always!))
 * Transforming the y values corrects problems with the error terms (and may help the non-linearity).
 * Transforming the x values primarily corrects the non-linearity.
 
@@ -342,9 +345,7 @@ newX <- seq(min(age), max(age), length=100)
 newXsq <- newX**2
 
 plot(x=age, y=length,
-     panel.last = lines(newX,
-                        predict(model,
-                                newdata=data.frame(age=newX, agesq=newXsq))))
+     panel.last = lines(newX, predict(model, newdata=data.frame(age=newX, agesq=newXsq))))
 
 ```
 Find 95% prediction interval for length for an age of 5.
@@ -383,9 +384,7 @@ newX <- seq(min(Temp), max(Temp), length=100)
 newXsq <- newX**2
 
 plot(x=Temp, y=Yield,
-     panel.last = lines(newX,
-                        predict(model.2,
-                                newdata=data.frame(Temp=newX, Tempsq=newXsq))))
+     panel.last = lines(newX, predict(model.2, newdata=data.frame(Temp=newX, Tempsq=newXsq))))
 
 detach(yield)
 ```
@@ -395,7 +394,7 @@ Load the odor data.
 odor <- read.csv("DataL9/odor.csv", header=T)
 attach(odor)
 head(odor)
-pairs(odor)
+pairs(odor, lower.panel = NULL)
 ```
 Create squared variables and fit a multiple linear regression model of Odor on Temp + Ratio + Height + Tempsq + Ratiosq + Heightsq.
 Fit a multiple linear regression model of Odor on Temp + Ratio + Height + Tempsq + Ratiosq.
